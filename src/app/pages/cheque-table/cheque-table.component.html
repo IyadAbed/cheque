@@ -8,14 +8,10 @@
         [columns]="cols"
         responsiveLayout="scroll"
         [rows]="10"
-        [globalFilterFields]="[
-          'name',
-          'country.name',
-          'representative.name',
-          'status'
-        ]"
+        [globalFilterFields]="['chequePayTo']"
         [paginator]="true"
-        [rowsPerPageOptions]="[10, 20, 30]"
+        [rowsPerPageOptions]="[10, 20, 30, 40, 50, 100]"
+        (rowsChange)="getAllCheque($event)"
         [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [(selection)]="selectedProducts"
@@ -27,7 +23,7 @@
           <div
             class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
           >
-            <h5 class="m-0">Manage Products</h5>
+            <h5 class="m-0">Manage Cheque's</h5>
             <div class="flex gap-2">
               <span class="block mt-2 md:mt-0 p-input-icon-left">
                 <i class="pi pi-search"></i>
@@ -39,12 +35,12 @@
                   class="w-full sm:w-auto"
                 />
               </span>
-              <p-dropdown
+              <!-- <p-dropdown
                 [options]="cities"
                 [(ngModel)]="selectedDrop"
                 placeholder="Select a Section"
                 [showClear]="true"
-              ></p-dropdown>
+              ></p-dropdown> -->
             </div>
             <div class="flex gap-2">
               <button
@@ -55,7 +51,7 @@
                 class="p-button-success"
                 (click)="openNew()"
               ></button>
-              <button
+              <!-- <button
                 pButton
                 pRipple
                 label="Delete"
@@ -63,15 +59,15 @@
                 class="p-button-danger"
                 (click)="deleteSelectedProducts()"
                 [disabled]="!selectedProducts || !selectedProducts.length"
-              ></button>
-              <button
+              ></button> -->
+              <!-- <button
                 pButton
                 pRipple
                 label="Export"
                 icon="pi pi-upload"
                 class="p-button-help"
                 (click)="dt.exportCSV()"
-              ></button>
+              ></button> -->
             </div>
           </div>
         </ng-template>
@@ -80,24 +76,24 @@
             <th style="width: 3rem">
               <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
             </th>
-            <th pSortableColumn="code">
-              Code <p-sortIcon field="code"></p-sortIcon>
+            <th pSortableColumn="chequeNumber">
+              Cheque Number <p-sortIcon field="chequeNumber"></p-sortIcon>
             </th>
-            <th pSortableColumn="name">
-              Name <p-sortIcon field="name"></p-sortIcon>
+            <th pSortableColumn="chequePayTo">
+              Cheque Pay To <p-sortIcon field="chequePayTo"></p-sortIcon>
             </th>
             <!-- <th>Image</th> -->
-            <th pSortableColumn="price">
-              Price <p-sortIcon field="price"></p-sortIcon>
+            <th pSortableColumn="chequeAmount">
+              Cheque Amount <p-sortIcon field="chequeAmount"></p-sortIcon>
             </th>
-            <th pSortableColumn="category">
-              Category <p-sortIcon field="category"></p-sortIcon>
+            <th pSortableColumn="dateOfPay">
+              Date Of Pay <p-sortIcon field="dateOfPay"></p-sortIcon>
             </th>
             <!-- <th pSortableColumn="rating">
               Reviews <p-sortIcon field="rating"></p-sortIcon>
             </th> -->
-            <th pSortableColumn="inventoryStatus">
-              Status <p-sortIcon field="inventoryStatus"></p-sortIcon>
+            <th pSortableColumn="isPayed">
+              Is Payed <p-sortIcon field="isPayed"></p-sortIcon>
             </th>
             <th></th>
           </tr>
@@ -108,12 +104,13 @@
               <p-tableCheckbox [value]="product"></p-tableCheckbox>
             </td>
             <td style="width: 16%; min-width: 10rem">
-              <span class="p-column-title">Code</span>
-              {{ product.code || product.id }}
+              <span class="p-column-title">Cheque Number</span>
+
+              {{ product.chequeNumber || product.id }}
             </td>
             <td style="width: 16%; min-width: 10rem">
-              <span class="p-column-title">Name</span>
-              {{ product.name }}
+              <span class="p-column-title">Cheque Pay To</span>
+              {{ product.chequePayTo }}
             </td>
             <!-- <td style="width: 16%; min-width: 10rem">
               <span class="p-column-title">Image</span>
@@ -125,12 +122,12 @@
               />
             </td> -->
             <td style="width: 16%; min-width: 8rem">
-              <span class="p-column-title">Price</span>
-              {{ product.price | currency : "USD" }}
+              <span class="p-column-title">Cheque Amount</span>
+              {{ product.chequeAmount | currency : "USD" }}
             </td>
             <td style="width: 16%; min-width: 10rem">
-              <span class="p-column-title">Category</span>
-              {{ product.category }}
+              <span class="p-column-title">Date Of Pay</span>
+              {{ product.dateOfPay }}
             </td>
             <!-- <td style="width: 16%; min-width: 10rem">
               <span class="p-column-title">Reviews</span>
@@ -141,7 +138,7 @@
               ></p-rating>
             </td> -->
             <td style="width: 16%; min-width: 10rem">
-              <span class="p-column-title">Status</span>
+              <span class="p-column-title">Is Payed</span>
               <span
                 [class]="
                   'product-badge status-' +
@@ -149,11 +146,18 @@
                     ? product.inventoryStatus.toLowerCase()
                     : '')
                 "
-                >{{ product.inventoryStatus }}</span
+                >{{ product.isPayed }}</span
               >
             </td>
             <td>
               <div class="flex">
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-check"
+                  class="p-button-rounded p-button-success mr-2"
+                  (click)="chequeUpdateStatus(product)"
+                ></button>
                 <button
                   pButton
                   pRipple
@@ -166,7 +170,7 @@
                   pRipple
                   icon="pi pi-trash"
                   class="p-button-rounded p-button-warning"
-                  (click)="deleteProduct(product)"
+                  (click)="deleteCheque(product)"
                 ></button>
               </div>
             </td>
@@ -326,47 +330,55 @@
       </ng-template>
     </p-dialog>
 
-    <!-- Add New Item -->
-    <!-- Add New Item -->
-    <!-- Add New Item -->
+    <!-- Add New Cheque -->
+    <!-- Add New Cheque -->
+    <!-- Add New Cheque -->
 
     <p-dialog
-      [(visible)]="itemDialog"
-      [style]="{ width: '600px' }"
-      header="Add New Item"
+      [(visible)]="chequeDialog"
+      [style]="{ width: '600px', height: '570px' }"
+      header="Add New Cheque"
       [modal]="true"
       class="p-fluid"
-      [formGroup]="itemForm"
+      [formGroup]="chequeForm"
     >
-      <ng-template pTemplate="content">
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
         <div class="field">
-          <label for="name">Name</label>
+          <label for="name">Pay against</label>
           <input
             type="text"
             pInputText
             id="name"
-            [(ngModel)]="product.name"
+            formControlName="chequePayTo"
             required
             autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
+            required
+            [ngClass]="{
+              'ng-invalid ng-dirty': this.chequeForm.get('chequePayTo').valid
+            }"
           />
           <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
             >Name is required.</small
           >
         </div>
+
         <div class="field">
-          <label for="description">Description</label>
+          <label for="description">Cheque Number</label>
           <textarea
             id="description"
             pInputTextarea
-            [(ngModel)]="product.description"
             required
+            formControlName="chequeNumber"
             rows="3"
             cols="20"
           ></textarea>
         </div>
-        <div class="field">
-          <label for="status">Inventory Status</label>
+
+        <!-- <div class="field">
+          <label for="status">Cheque Status</label>
           <p-dropdown
             [(ngModel)]="product.inventoryStatus"
             inputId="inventoryStatus"
@@ -390,67 +402,30 @@
               }}</span>
             </ng-template>
           </p-dropdown>
-        </div>
-
-        <div class="field">
-          <label class="mb-3">Category</label>
-          <div class="formgrid grid">
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category1"
-                name="category"
-                value="Accessories"
-                [(ngModel)]="product.category"
-              ></p-radioButton>
-              <label for="category1">Accessories</label>
-            </div>
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category2"
-                name="category"
-                value="Clothing"
-                [(ngModel)]="product.category"
-              ></p-radioButton>
-              <label for="category2">Clothing</label>
-            </div>
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category3"
-                name="category"
-                value="Electronics"
-                [(ngModel)]="product.category"
-              ></p-radioButton>
-              <label for="category3">Electronics</label>
-            </div>
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category4"
-                name="category"
-                value="Fitness"
-                [(ngModel)]="product.category"
-              ></p-radioButton>
-              <label for="category4">Fitness</label>
-            </div>
-          </div>
-        </div>
+        </div> -->
 
         <div class="formgrid grid">
           <div class="field col">
-            <label for="price">Price</label>
+            <label for="price">Cheque Amount</label>
             <p-inputNumber
               id="price"
-              [(ngModel)]="product.price"
+              formControlName="chequeAmount"
               mode="currency"
               currency="USD"
               locale="en-US"
+              required
             ></p-inputNumber>
           </div>
+        </div>
+        <div class="formgrid grid mt-8">
           <div class="field col">
-            <label for="quantity">Quantity</label>
-            <p-inputNumber
-              id="quantity"
-              [(ngModel)]="product.quantity"
-            ></p-inputNumber>
+            <label for="price">Cheque Data</label>
+            <p-calendar
+              required
+              formControlName="dateOfPay"
+              [readonlyInput]="true"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
           </div>
         </div>
       </ng-template>
@@ -462,7 +437,7 @@
           label="Cancel"
           icon="pi pi-times"
           class="p-button-text"
-          (click)="hideDialog()"
+          (click)="this.chequeDialog = false"
         ></button>
         <button
           pButton
@@ -470,10 +445,134 @@
           label="Save"
           icon="pi pi-check"
           class="p-button-text"
-          (click)="saveProduct()"
+          (click)="addNewCheque()"
         ></button>
       </ng-template>
     </p-dialog>
+
+    <!-- Update Cheque -->
+    <!-- Update Cheque -->
+    <!-- Update Cheque -->
+
+    <p-dialog
+      [(visible)]="UpdateChequeDialog"
+      [style]="{ width: '600px', height: '570px' }"
+      header="Update Cheque"
+      [modal]="true"
+      class="p-fluid"
+      [formGroup]="chequeForm"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <div class="field">
+          <label for="name">Pay against</label>
+          <input
+            type="text"
+            pInputText
+            id="name"
+            formControlName="chequePayTo"
+            required
+            autofocus
+            required
+            [ngClass]="{
+              'ng-invalid ng-dirty': this.chequeForm.get('chequePayTo').valid
+            }"
+          />
+          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
+            >Name is required.</small
+          >
+        </div>
+
+        <div class="field">
+          <label for="description">Cheque Number</label>
+          <textarea
+            id="description"
+            pInputTextarea
+            required
+            formControlName="chequeNumber"
+            rows="3"
+            cols="20"
+          ></textarea>
+        </div>
+
+        <!-- <div class="field">
+          <label for="status">Cheque Status</label>
+          <p-dropdown
+            [(ngModel)]="product.inventoryStatus"
+            inputId="inventoryStatus"
+            optionValue="label"
+            [options]="statuses"
+            placeholder="Select"
+          >
+            <ng-template pTemplate="selectedItem">
+              <span
+                *ngIf="product && product.inventoryStatus"
+                [class]="
+                  'product-badge status-' +
+                  product.inventoryStatus.toString().toLowerCase()
+                "
+                >{{ product.inventoryStatus }}</span
+              >
+            </ng-template>
+            <ng-template let-option pTemplate="item">
+              <span [class]="'product-badge status-' + option.value">{{
+                option.label
+              }}</span>
+            </ng-template>
+          </p-dropdown>
+        </div> -->
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">Cheque Amount</label>
+            <p-inputNumber
+              id="price"
+              formControlName="chequeAmount"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              required
+            ></p-inputNumber>
+          </div>
+        </div>
+        <div class="formgrid grid mt-8">
+          <div class="field col">
+            <label for="price">Cheque Data</label>
+            <p-calendar
+              required
+              formControlName="dateOfPay"
+              [readonlyInput]="true"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="this.UpdateChequeDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="updateCheque()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Delete Cheque -->
+    <!-- Delete Cheque -->
+    <!-- Delete Cheque -->
 
     <p-dialog
       [(visible)]="deleteProductDialog"
@@ -484,8 +583,8 @@
       <div class="flex align-items-center justify-content-center">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
         <span *ngIf="product"
-          >Are you sure you want to delete <b>{{ product.name }}</b
-          >?</span
+          >Are you sure you want to delete
+          <b>{{ product.chequePayTo }}</b> Cheque?</span
         >
       </div>
       <ng-template pTemplate="footer">
@@ -508,7 +607,48 @@
       </ng-template>
     </p-dialog>
 
+    <!-- Pay Cheque -->
+    <!-- Pay Cheque -->
+    <!-- Pay Cheque -->
+
     <p-dialog
+      [(visible)]="payChequeDialog"
+      header="Confirm"
+      [modal]="true"
+      [style]="{ width: '450px' }"
+    >
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="product"
+          >Are you sure you want to Pay
+          <b>{{ product.chequePayTo }}</b> Cheque?</span
+        >
+      </div>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          icon="pi pi-times"
+          class="p-button-text"
+          label="No"
+          (click)="payChequeDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          icon="pi pi-check"
+          class="p-button-text"
+          label="Yes"
+          (click)="confirmUpdateStatus()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Delete Selected Product -->
+    <!-- Delete Selected Product -->
+    <!-- Delete Selected Product -->
+
+    <!-- <p-dialog
       [(visible)]="deleteProductsDialog"
       header="Confirm"
       [modal]="true"
@@ -536,374 +676,6 @@
           (click)="confirmDeleteSelected()"
         ></button>
       </ng-template>
-    </p-dialog>
-
-    <!-- Add New Category -->
-    <!-- Add New Category -->
-    <!-- Add New Category -->
-
-    <p-dialog
-      [(visible)]="categoryDialog"
-      [style]="{ width: '600px' }"
-      header="Add New Category"
-      [modal]="true"
-      class="p-fluid"
-      [formGroup]="categoryForm"
-    >
-      <ng-template pTemplate="content">
-        <div class="field">
-          <label for="name">Name in english</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            formControlName="nameEn"
-            required
-            autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div class="field">
-          <label for="name">Name in arabic</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            formControlName="nameAr"
-            required
-            autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div class="field">
-          <label for="description">Description in english</label>
-          <textarea
-            id="description"
-            pInputTextarea
-            formControlName="descriptionEn"
-            required
-            rows="3"
-            cols="20"
-          ></textarea>
-        </div>
-        <div class="field">
-          <label for="description">Description in arabic</label>
-          <textarea
-            id="description"
-            pInputTextarea
-            formControlName="descriptionAr"
-            required
-            rows="3"
-            cols="20"
-          ></textarea>
-        </div>
-        <div class="field-checkbox">
-          <p-checkbox
-            name="group1"
-            #valCheck
-            value="New York"
-            formControlName="isOffer"
-            id="ny"
-          ></p-checkbox>
-          <label for="ny">Is Offer</label>
-        </div>
-      </ng-template>
-
-      <ng-template pTemplate="footer">
-        <button
-          pButton
-          pRipple
-          label="Cancel"
-          icon="pi pi-times"
-          class="p-button-text"
-          (click)="categoryDialog = false"
-        ></button>
-        <button
-          pButton
-          pRipple
-          label="Save"
-          icon="pi pi-check"
-          class="p-button-text"
-          (click)="categoryDialog = false"
-        ></button>
-      </ng-template>
-    </p-dialog>
-    <!-- Add New Section -->
-    <!-- Add New Section -->
-    <!-- Add New Section -->
-
-    <p-dialog
-      [(visible)]="sectionDialog"
-      [style]="{ width: '600px' }"
-      header="Add New Section"
-      [modal]="true"
-      class="p-fluid"
-      [formGroup]="sectionForm"
-    >
-      <ng-template pTemplate="content">
-        <div class="field">
-          <label for="name">Name in english</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            formControlName="nameEn"
-            required
-            autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div class="field">
-          <label for="name">Name in arabic</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            formControlName="nameAr"
-            required
-            autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div class="field">
-          <label for="description">Description in english</label>
-          <textarea
-            id="description"
-            pInputTextarea
-            formControlName="descriptionEn"
-            required
-            rows="3"
-            cols="20"
-          ></textarea>
-        </div>
-        <div class="field">
-          <label for="description">Description in arabic</label>
-          <textarea
-            id="description"
-            pInputTextarea
-            formControlName="descriptionAr"
-            required
-            rows="3"
-            cols="20"
-          ></textarea>
-        </div>
-        <div class="field">
-          <label class="mb-3">Category</label>
-          <div class="formgrid grid">
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category1"
-                name="categoryId"
-                value="Accessories"
-                formControlName="categoryId"
-              ></p-radioButton>
-              <label for="category1">Accessories</label>
-            </div>
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category2"
-                name="categoryId"
-                value="Clothing"
-                formControlName="categoryId"
-              ></p-radioButton>
-              <label for="category2">Clothing</label>
-            </div>
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category3"
-                name="categoryId"
-                value="Electronics"
-                formControlName="categoryId"
-              ></p-radioButton>
-              <label for="category3">Electronics</label>
-            </div>
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category4"
-                name="categoryId"
-                value="Fitness"
-                formControlName="categoryId"
-              ></p-radioButton>
-              <label for="category4">Fitness</label>
-            </div>
-          </div>
-        </div>
-      </ng-template>
-
-      <ng-template pTemplate="footer">
-        <button
-          pButton
-          pRipple
-          label="Cancel"
-          icon="pi pi-times"
-          class="p-button-text"
-          (click)="sectionDialog = false"
-        ></button>
-        <button
-          pButton
-          pRipple
-          label="Save"
-          icon="pi pi-check"
-          class="p-button-text"
-          (click)="sectionDialog = false"
-        ></button>
-      </ng-template>
-    </p-dialog>
-
-    <!-- Add New Size -->
-    <!-- Add New Size -->
-    <!-- Add New Size -->
-    <p-dialog
-      [(visible)]="sizeDialog"
-      [style]="{ width: '600px' }"
-      header="Add New Size"
-      [modal]="true"
-      class="p-fluid"
-      [formGroup]="sizeForm"
-    >
-      <ng-template pTemplate="content">
-        <div class="field">
-          <label for="name">Name in english</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            formControlName="nameEn"
-            required
-            autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div class="field">
-          <label for="name">Name in arabic</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            formControlName="nameAr"
-            required
-            autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div class="field">
-          <label for="value">Price</label>
-          <p-inputNumber
-            id="value"
-            formControlName="value"
-            required
-          ></p-inputNumber>
-        </div>
-      </ng-template>
-
-      <ng-template pTemplate="footer">
-        <button
-          pButton
-          pRipple
-          label="Cancel"
-          icon="pi pi-times"
-          class="p-button-text"
-          (click)="sizeDialog = false"
-        ></button>
-        <button
-          pButton
-          pRipple
-          label="Save"
-          icon="pi pi-check"
-          class="p-button-text"
-          (click)="sizeDialog = false"
-        ></button>
-      </ng-template>
-    </p-dialog>
-
-    <!-- Add New Option -->
-    <!-- Add New Option -->
-    <!-- Add New Option -->
-    <p-dialog
-      [(visible)]="optionDialog"
-      [style]="{ width: '600px' }"
-      header="Add New Size"
-      [modal]="true"
-      class="p-fluid"
-      [formGroup]="optionForm"
-    >
-      <ng-template pTemplate="content">
-        <div class="field">
-          <label for="name">Name in english</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            formControlName="nameEn"
-            required
-            autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div class="field">
-          <label for="name">Name in arabic</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            formControlName="nameAr"
-            required
-            autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div class="field">
-          <label for="price">Price</label>
-          <p-inputNumber
-            id="price"
-            formControlName="price"
-            required
-          ></p-inputNumber>
-        </div>
-      </ng-template>
-
-      <ng-template pTemplate="footer">
-        <button
-          pButton
-          pRipple
-          label="Cancel"
-          icon="pi pi-times"
-          class="p-button-text"
-          (click)="optionDialog = false"
-        ></button>
-        <button
-          pButton
-          pRipple
-          label="Save"
-          icon="pi pi-check"
-          class="p-button-text"
-          (click)="optionDialog = false"
-        ></button>
-      </ng-template>
-    </p-dialog>
+    </p-dialog> -->
   </div>
 </div>

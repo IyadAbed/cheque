@@ -29,4 +29,70 @@ export class HttpService {
       isFormData: isFormData,
     });
   }
+
+  sendDeleteRequest<TRequest, TResponse>(
+    url: string,
+    port: number,
+    body?: any,
+    version?: 'v1' | 'v2'
+  ) {
+    const apiUrl = `${this.usersEndPoint}:${port}/api/${
+      version ? version : 'v1'
+    }/${url}`;
+    return this.restService.request<TRequest, TResponse>({
+      method: 'DELETE',
+      url: apiUrl,
+      body: body,
+      withoutBody: body ? true : false,
+      showToaster: false,
+    });
+  }
+
+  sendPatchRequest<TRequest, TResponse>(
+    url: string,
+    body: any,
+    port: number,
+    version?: 'v1' | 'v2'
+  ) {
+    const apiUrl = `${this.usersEndPoint}:${port}/api/${
+      version ? version : 'v1'
+    }/${url}`;
+    return this.restService.request<TRequest, TResponse>({
+      method: 'PATCH',
+      url: apiUrl,
+      body,
+      withoutBody: true,
+    });
+  }
+
+  sendPutRequest<TRequest, TResponse>(
+    url: string,
+    body: any,
+    port: number,
+    version?: 'v1' | 'v2'
+  ) {
+    const apiUrl = `${this.usersEndPoint}:${port}/api/${
+      version ? version : 'v1'
+    }/${url}`;
+
+    return this.restService.request<TRequest, TResponse>({
+      method: 'PUT',
+      url: apiUrl,
+      body: body,
+      withoutBody: true,
+      showToaster: false,
+    });
+  }
+  sendPutRequestWithoutBody(url: string, port: number, version?: 'v1' | 'v2') {
+    const apiUrl = `${this.usersEndPoint}:${port}/api/${
+      version ? version : 'v1'
+    }/${url}`;
+
+    return this.restService.request({
+      method: 'PUT',
+      url: apiUrl,
+      withoutBody: true,
+      showToaster: false,
+    });
+  }
 }

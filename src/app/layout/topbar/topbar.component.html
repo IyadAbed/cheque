@@ -1,5 +1,5 @@
 <div class="layout-topbar">
-  <a class="layout-topbar-logo" routerLink="">
+  <a class="layout-topbar-logo">
     <img
       src="assets/layout/images/{{
         layoutService.config().colorScheme === 'light'
@@ -11,13 +11,13 @@
     <span>SAKAI</span>
   </a>
 
-  <button
+  <!-- <button
     #menubutton
     class="p-link layout-menu-button layout-topbar-button"
     (click)="layoutService.onMenuToggle()"
   >
     <i class="pi pi-bars"></i>
-  </button>
+  </button> -->
 
   <button
     #topbarmenubutton

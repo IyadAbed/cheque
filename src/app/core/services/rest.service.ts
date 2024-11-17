@@ -64,28 +64,28 @@ export class RestService {
               if (this.showToaster)
                 this.toast.showSuccess(response.data?.message);
             },
-            // error: (error: any) => {
-            //   console.log(error.error.message, "eroorMomo");
-            //   switch (error.status) {
-            //     case 401:
-            //       this.toast.showInfo(error.error.message);
-            //       break;
-            //     case 500:
-            //       this.toast.showError(error.error.msg);
-            //       break;
-            //     default:
-            //       if (error.error.errors)
-            //         error.error.errors.forEach((err: any) => {
-            //           this.toast.showError(err);
-            //         });
+            error: (error: any) => {
+              console.log(error.error.message, 'eroorMomo');
+              switch (error.status) {
+                case 401:
+                  this.toast.showInfo(error.error.message);
+                  break;
+                case 500:
+                  this.toast.showError(error.error.msg);
+                  break;
+                default:
+                  if (error.error.errors)
+                    error.error.errors.forEach((err: any) => {
+                      this.toast.showError(err);
+                    });
 
-            //       if (error.error.message)
-            //         this.toast.showError(error.error.message);
+                  if (error.error.message)
+                    this.toast.showError(error.error.message);
 
-            //       if (error.error.msg) this.toast.showError(error.error.msg);
-            //       break;
-            //   }
-            // },
+                  if (error.error.msg) this.toast.showError(error.error.msg);
+                  break;
+              }
+            },
           })
         );
       case 'post':
@@ -185,30 +185,29 @@ export class RestService {
         return this.http.delete<TResponse>(url, requestOptions).pipe(
           tap({
             next: (response: any) => {
-              // if (this.showToaster && response.message)
-              //   this.toast.showSuccess(response.message);
-              // if (this.showToaster && response.msg)
-              //   this.toast.showSuccess(response.msg);
+              if (this.showToaster && response.message)
+                this.toast.showSuccess(response.message);
+              if (this.showToaster && response.msg)
+                this.toast.showSuccess(response.msg);
             },
             error: (error: any) => {
               switch (error.status) {
                 case 401:
-                  // this.toast.showInfo(error.error.message);
+                  this.toast.showInfo(error.error.message);
                   break;
                 case 500:
-                  // this.toast.showError(error.error.msg);
+                  this.toast.showError(error.error.msg);
                   break;
                 default:
-                  // if (error.error.errors)
-                  //   error.error.errors.forEach((err: any) => {
-                  //     this.toast.showError(err);
-                  //   });
+                  if (error.error.errors)
+                    error.error.errors.forEach((err: any) => {
+                      this.toast.showError(err);
+                    });
 
-                  // if (error.error.message)
-                  //   this.toast.showError(error.error.message);
+                  if (error.error.message)
+                    this.toast.showError(error.error.message);
 
-                  // if (error.error.msg)
-                  //   this.toast.showError(error.error.msg);
+                  if (error.error.msg) this.toast.showError(error.error.msg);
                   break;
               }
             },

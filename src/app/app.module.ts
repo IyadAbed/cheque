@@ -6,11 +6,20 @@ import { AppRoutingModule } from './app-routing.module';
 import { CommonModule } from '@angular/common';
 import { AuthGuard } from './auth.guard';
 import { LayoutModule } from './layout/layout.module';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { headerInterceptor } from './core/services/interceptorLang.service';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [AppRoutingModule, BrowserModule, CommonModule, LayoutModule],
-  providers: [AuthGuard],
+  providers: [
+    AuthGuard,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: headerInterceptor,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
