@@ -178,24 +178,24 @@
             <th style="width: 3rem">
               <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
             </th>
-            <th pSortableColumn="chequeNumber">
-              Cheque Number <p-sortIcon field="chequeNumber"></p-sortIcon>
+            <th pSortableColumn="dateOfPay">
+              Date Of Pay <p-sortIcon field="dateOfPay"></p-sortIcon>
             </th>
             <th pSortableColumn="chequePayTo">
               Cheque Pay To <p-sortIcon field="chequePayTo"></p-sortIcon>
             </th>
-            <th pSortableColumn="Credit">
-              Credit <p-sortIcon field="Credit"></p-sortIcon>
-            </th>
             <th pSortableColumn="Debit">
               Debit <p-sortIcon field="Debit"></p-sortIcon>
+            </th>
+            <th pSortableColumn="Credit">
+              Credit <p-sortIcon field="Credit"></p-sortIcon>
             </th>
             <!-- <th>Image</th> -->
             <th pSortableColumn="Balance">
               Balance <p-sortIcon field="Balance"></p-sortIcon>
             </th>
-            <th pSortableColumn="dateOfPay">
-              Date Of Pay <p-sortIcon field="dateOfPay"></p-sortIcon>
+            <th pSortableColumn="chequeNumber">
+              Cheque Number <p-sortIcon field="chequeNumber"></p-sortIcon>
             </th>
             <!-- <th pSortableColumn="rating">
               Reviews <p-sortIcon field="rating"></p-sortIcon>
@@ -212,13 +212,20 @@
               <p-tableCheckbox [value]="product"></p-tableCheckbox>
             </td>
             <td style="width: 12%; min-width: 10rem">
-              <span class="p-column-title">Cheque Number</span>
-
-              {{ product.chequeNumber || product.id }}
+              <span class="p-column-title">Date Of Pay</span>
+              {{ product.dateOfPay }}
             </td>
             <td style="width: 12%; min-width: 10rem">
               <span class="p-column-title">Cheque Pay To</span>
               {{ product.chequePayTo }}
+            </td>
+            <td style="width: 12%; min-width: 8rem">
+              <span class="p-column-title">Debit</span>
+              {{
+                product.chequeType == "DEBIT"
+                  ? (product.chequeAmount | currency : "AED")
+                  : (0 | currency : "AED")
+              }}
             </td>
             <td style="width: 12%; min-width: 10rem">
               <span class="p-column-title">Credit</span>
@@ -229,20 +236,13 @@
               }}
             </td>
             <td style="width: 12%; min-width: 8rem">
-              <span class="p-column-title">Debit</span>
-              {{
-                product.chequeType == "DEBIT"
-                  ? (product.chequeAmount | currency : "AED")
-                  : (0 | currency : "AED")
-              }}
-            </td>
-            <td style="width: 12%; min-width: 8rem">
               <span class="p-column-title">Balance</span>
               {{ product.balance | currency : "AED" }}
             </td>
             <td style="width: 12%; min-width: 10rem">
-              <span class="p-column-title">Date Of Pay</span>
-              {{ product.dateOfPay }}
+              <span class="p-column-title">Cheque Number</span>
+
+              {{ product.chequeNumber || "-" }}
             </td>
             <td style="width: 12%; min-width: 10rem">
               <span class="p-column-title">Is Payed</span>
@@ -322,15 +322,8 @@
         </div>
 
         <div class="field">
-          <label for="description">Cheque Number</label>
-          <textarea
-            id="description"
-            pInputTextarea
-            required
-            formControlName="chequeNumber"
-            rows="3"
-            cols="20"
-          ></textarea>
+          <label htmlFor="chequeNumber">Cheque Number</label>
+          <input pInputText formControlName="chequeNumber" type="text" />
         </div>
 
         <div class="formgrid grid">
@@ -434,15 +427,8 @@
         </div>
 
         <div class="field">
-          <label for="description">Cheque Number</label>
-          <textarea
-            id="description"
-            pInputTextarea
-            required
-            formControlName="chequeNumber"
-            rows="3"
-            cols="20"
-          ></textarea>
+          <label htmlFor="chequeNumber">Cheque Number</label>
+          <input pInputText formControlName="chequeNumber" type="text" />
         </div>
 
         <!-- <div class="field">

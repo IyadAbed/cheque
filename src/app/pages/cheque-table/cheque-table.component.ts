@@ -75,7 +75,7 @@ export class ChequeTableComponent implements OnInit {
     this.chequeForm = fb.group({
       chequeAmount: [0, Validators.required],
       chequePayTo: ['', Validators.required],
-      chequeNumber: [0, Validators.required],
+      chequeNumber: [0],
       dateOfPay: ['', Validators.required],
       isPayed: [null],
       chequeType: [null],
