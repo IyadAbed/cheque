@@ -55,7 +55,6 @@
                   <p-calendar
                     formControlName="startDateOfPay"
                     required
-                    [readonlyInput]="true"
                     dateFormat="dd/mm/yy"
                   ></p-calendar>
                 </div>
@@ -64,7 +63,6 @@
                   <p-calendar
                     formControlName="endDateOfPay"
                     required
-                    [readonlyInput]="true"
                     dateFormat="dd/mm/yy"
                   ></p-calendar>
                 </div>
@@ -226,7 +224,7 @@
               <span class="p-column-title">Credit</span>
               {{
                 product.chequeType == "CREDIT"
-                  ? product.chequeAmount
+                  ? (product.chequeAmount | currency : "AED")
                   : (0 | currency : "AED")
               }}
             </td>
@@ -234,7 +232,7 @@
               <span class="p-column-title">Debit</span>
               {{
                 product.chequeType == "DEBIT"
-                  ? product.chequeAmount
+                  ? (product.chequeAmount | currency : "AED")
                   : (0 | currency : "AED")
               }}
             </td>
@@ -374,7 +372,6 @@
             <p-calendar
               required
               formControlName="dateOfPay"
-              [readonlyInput]="true"
               dateFormat="dd/mm/yy"
             ></p-calendar>
           </div>
@@ -516,7 +513,6 @@
             <p-calendar
               required
               formControlName="dateOfPay"
-              [readonlyInput]="true"
               dateFormat="dd/mm/yy"
             ></p-calendar>
           </div>

@@ -85,6 +85,11 @@ export class ChequeTableComponent implements OnInit {
   ngOnInit() {
     // this.getProducts().then((data) => (this.products = data));
     this.getAllCheque(10);
+    this.searchForm.valueChanges.subscribe(() => {
+      console.log('====================================');
+      console.log(this.searchForm.value);
+      console.log('====================================');
+    });
     this.cols = [
       { field: 'product', header: 'Product' },
       { field: 'price', header: 'Price' },
@@ -139,11 +144,18 @@ export class ChequeTableComponent implements OnInit {
     ];
   }
 
+  normalizeDate(date: any): string | null {
+    if (!date) return null;
+    const d = new Date(date);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // Adjust to UTC without changing the time
+    return d.toISOString().split('T')[0]; // Keep only the date part
+  }
+
   getAllCheque(pageSize: any) {
     this.https
       .sendPostRequest<ChequeDetailsRes, any>(
         `checks/list/search`,
-        {},
+        { isPayed: false },
         8080,
         false,
         'v1'
@@ -186,10 +198,10 @@ export class ChequeTableComponent implements OnInit {
           : null,
         isPayed: this.searchForm.value.isPayed?.value,
         startDateOfPay: this.searchForm.value.startDateOfPay
-          ? this.searchForm.value.startDateOfPay
+          ? this.normalizeDate(this.searchForm.value.startDateOfPay)
           : null,
         endDateOfPay: this.searchForm.value.endDateOfPay
-          ? this.searchForm.value.endDateOfPay
+          ? this.normalizeDate(this.searchForm.value.endDateOfPay)
           : null,
         chequeType: this.searchForm.value.chequeType?.value
           ? this.searchForm.value.chequeType.value
@@ -291,6 +303,7 @@ export class ChequeTableComponent implements OnInit {
 
       body = {
         ...body,
+        dateOfPay: this.normalizeDate(this.chequeForm.value.dateOfPay),
         chequeType: this.chequeForm.value.chequeType?.value,
         isPayed: this.chequeForm.value.isPayed?.value,
       };
@@ -416,6 +429,7 @@ export class ChequeTableComponent implements OnInit {
       let body = this.chequeForm.value;
       body = {
         ...body,
+        dateOfPay: this.normalizeDate(this.chequeForm.value.dateOfPay),
         chequeType: this.chequeForm.value.chequeType?.value,
         isPayed: this.chequeForm.value.isPayed?.value,
       };
