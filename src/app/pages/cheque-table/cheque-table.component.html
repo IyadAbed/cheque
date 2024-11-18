@@ -178,11 +178,11 @@
             <th style="width: 3rem">
               <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
             </th>
-            <th pSortableColumn="dateOfPay">
-              Date Of Pay <p-sortIcon field="dateOfPay"></p-sortIcon>
-            </th>
             <th pSortableColumn="chequePayTo">
               Cheque Pay To <p-sortIcon field="chequePayTo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="dateOfPay">
+              Date Of Pay <p-sortIcon field="dateOfPay"></p-sortIcon>
             </th>
             <th pSortableColumn="Debit">
               Debit <p-sortIcon field="Debit"></p-sortIcon>
@@ -212,12 +212,12 @@
               <p-tableCheckbox [value]="product"></p-tableCheckbox>
             </td>
             <td style="width: 12%; min-width: 10rem">
-              <span class="p-column-title">Date Of Pay</span>
-              {{ product.dateOfPay }}
-            </td>
-            <td style="width: 12%; min-width: 10rem">
               <span class="p-column-title">Cheque Pay To</span>
               {{ product.chequePayTo }}
+            </td>
+            <td style="width: 12%; min-width: 10rem">
+              <span class="p-column-title">Date Of Pay</span>
+              {{ product.dateOfPay }}
             </td>
             <td style="width: 12%; min-width: 8rem">
               <span class="p-column-title">Debit</span>
