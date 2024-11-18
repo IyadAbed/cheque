@@ -15,6 +15,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { DataViewModule } from 'primeng/dataview';
+import { AccordionModule } from 'primeng/accordion';
 import { PickListModule } from 'primeng/picklist';
 import { OrderListModule } from 'primeng/orderlist';
 import { RatingModule } from 'primeng/rating';
@@ -47,6 +48,7 @@ import { ChequeTableComponent } from './cheque-table/cheque-table.component';
     InputTextareaModule,
     InputTextModule,
     DataViewModule,
+    AccordionModule,
     // PickListModule,
     // OrderListModule,
     InputTextModule,

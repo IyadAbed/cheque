@@ -21,14 +21,6 @@ export class ChequeTableComponent implements OnInit {
 
   productDialog: boolean = false;
 
-  categoryDialog: boolean = false;
-
-  sectionDialog: boolean = false;
-
-  sizeDialog: boolean = false;
-
-  optionDialog: boolean = false;
-
   chequeDialog: boolean = false;
 
   deleteProductDialog: boolean = false;
@@ -45,31 +37,21 @@ export class ChequeTableComponent implements OnInit {
 
   sortOptions: SelectItem[] = [];
 
+  chequeStatus: any[] = [];
+
+  chequeStatusAdd: any[] = [];
+
+  chequeType: any[] = [];
+
+  chequeTypeAdd: any[] = [];
+
   sortOrder: number = 0;
 
   sortField: string = '';
 
-  sourceCities: any[] = [];
-
-  targetCities: any[] = [];
-
-  orderCities: any[] = [];
-
-  statuses: any[] = [];
-
-  items: MenuItem[] = [];
-
-  categoryForm: FormGroup;
-
-  sectionForm: FormGroup;
-
-  sizeForm: FormGroup;
-
-  optionForm: FormGroup;
-
-  itemForm: FormGroup;
-
   chequeForm: FormGroup;
+
+  searchForm: FormGroup;
 
   constructor(
     private messageService: MessageService,
@@ -77,49 +59,17 @@ export class ChequeTableComponent implements OnInit {
     private http: HttpClient,
     private https: HttpService
   ) {
-    this.categoryForm = fb.group({
-      storeId: ['', Validators.required],
-      nameEn: ['', Validators.required],
-      nameAr: ['', Validators.required],
-      descriptionEn: ['', Validators.required],
-      descriptionAr: ['', Validators.required],
-      isOffer: [false, Validators.required],
-    });
-
-    this.sectionForm = fb.group({
-      categoryId: ['', Validators.required],
-      nameEn: ['', Validators.required],
-      nameAr: ['', Validators.required],
-      descriptionEn: ['', Validators.required],
-      descriptionAr: ['', Validators.required],
-    });
-
-    this.sizeForm = fb.group({
-      sectionId: ['', Validators.required],
-      nameEn: ['', Validators.required],
-      nameAr: ['', Validators.required],
-      value: [0, Validators.required],
-    });
-
-    this.optionForm = fb.group({
-      sectionId: ['', Validators.required],
-      nameEn: ['', Validators.required],
-      nameAr: ['', Validators.required],
-      price: [0, Validators.required],
-    });
-
-    this.itemForm = fb.group({
-      sectionId: ['', Validators.required],
-      nameEn: ['', Validators.required],
-      nameAr: ['', Validators.required],
-      descriptionEn: ['', Validators.required],
-      descriptionAr: ['', Validators.required],
-      sizeIds: ['', Validators.required],
-      optionIds: [''],
-      chequeAmount: [0, Validators.required],
-      chequePayTo: ['', Validators.required],
-      chequeNumber: [0, Validators.required],
-      dateOfPay: ['', Validators.required],
+    this.searchForm = fb.group({
+      chequePayTo: [null],
+      chequeNumber: [null],
+      startChequeAmount: [null],
+      endChequeAmount: [null],
+      isPayed: [null],
+      startDateOfPay: [null],
+      endDateOfPay: [null],
+      chequeType: [null],
+      startLatencyDate: [null],
+      endLatencyDate: [null],
     });
 
     this.chequeForm = fb.group({
@@ -127,6 +77,8 @@ export class ChequeTableComponent implements OnInit {
       chequePayTo: ['', Validators.required],
       chequeNumber: [0, Validators.required],
       dateOfPay: ['', Validators.required],
+      isPayed: [null],
+      chequeType: [null],
     });
   }
 
@@ -141,14 +93,23 @@ export class ChequeTableComponent implements OnInit {
       { field: 'inventoryStatus', header: 'Status' },
     ];
 
-    this.statuses = [
-      { label: 'INSTOCK', value: 'instock' },
-      { label: 'LOWSTOCK', value: 'lowstock' },
-      { label: 'OUTOFSTOCK', value: 'outofstock' },
+    this.chequeStatusAdd = [
+      { label: 'Not Payed', value: false },
+      { label: 'Payed', value: true },
     ];
-    this.items = [
-      { label: 'Update', icon: 'pi pi-refresh' },
-      { label: 'Delete', icon: 'pi pi-times' },
+    this.chequeTypeAdd = [
+      { label: 'Credit', value: 'CREDIT' },
+      { label: 'Debit', value: 'DEBIT' },
+    ];
+    this.chequeStatus = [
+      { label: 'All', value: null },
+      { label: 'Payed', value: true },
+      { label: 'Not Payed', value: false },
+    ];
+    this.chequeType = [
+      { label: 'All', value: null },
+      { label: 'Credit', value: 'CREDIT' },
+      { label: 'Debit', value: 'DEBIT' },
     ];
     // this.sourceCities = [
     //   { name: 'San Francisco', code: 'SF' },
@@ -179,19 +140,79 @@ export class ChequeTableComponent implements OnInit {
   }
 
   getAllCheque(pageSize: any) {
-    console.log('pageSize', pageSize);
-
     this.https
-      .sendPostRequest<ChequeDetailsRes, PaginatedChequeResponse>(
-        `checks/search?page=0&size=${pageSize}`,
+      .sendPostRequest<ChequeDetailsRes, any>(
+        `checks/list/search`,
         {},
         8080,
         false,
         'v1'
       )
       .subscribe((res) => {
-        this.products = res.content;
+        this.products = res;
       });
+  }
+
+  AdvanceSearch(reset: boolean) {
+    console.log('Form Search', this.searchForm.value);
+
+    if (reset) {
+      this.https
+        .sendPostRequest<ChequeDetailsRes, any>(
+          `checks/list/search`,
+          {},
+          8080,
+          false,
+          'v1'
+        )
+        .subscribe((res) => {
+          this.products = res;
+          this.searchForm.reset();
+        });
+    } else {
+      let body = this.searchForm.value;
+      body = {
+        chequePayTo: this.searchForm.value.chequePayTo
+          ? this.searchForm.value.chequePayTo
+          : null,
+        chequeNumber: this.searchForm.value.chequeNumber
+          ? +this.searchForm.value.chequeNumber
+          : null,
+        startChequeAmount: this.searchForm.value.startChequeAmount
+          ? this.searchForm.value.startChequeAmount
+          : null,
+        endChequeAmount: this.searchForm.value.endChequeAmount
+          ? this.searchForm.value.endChequeAmount
+          : null,
+        isPayed: this.searchForm.value.isPayed?.value,
+        startDateOfPay: this.searchForm.value.startDateOfPay
+          ? this.searchForm.value.startDateOfPay
+          : null,
+        endDateOfPay: this.searchForm.value.endDateOfPay
+          ? this.searchForm.value.endDateOfPay
+          : null,
+        chequeType: this.searchForm.value.chequeType?.value
+          ? this.searchForm.value.chequeType.value
+          : null,
+        startLatencyDate: this.searchForm.value.startLatencyDate
+          ? this.searchForm.value.startLatencyDate
+          : null,
+        endLatencyDate: this.searchForm.value.endLatencyDate
+          ? this.searchForm.value.endLatencyDate
+          : null,
+      };
+      this.https
+        .sendPostRequest<ChequeDetailsRes, any>(
+          `checks/list/search`,
+          body,
+          8080,
+          false,
+          'v1'
+        )
+        .subscribe((res) => {
+          this.products = res;
+        });
+    }
   }
 
   onSortChange(event: any) {
@@ -266,23 +287,22 @@ export class ChequeTableComponent implements OnInit {
   updateCheque() {
     this.chequeForm.markAllAsTouched();
     if (this.chequeForm.valid) {
-      const body = this.chequeForm.value;
+      let body = this.chequeForm.value;
+
+      body = {
+        ...body,
+        chequeType: this.chequeForm.value.chequeType?.value,
+        isPayed: this.chequeForm.value.isPayed?.value,
+      };
+
       this.https
-        .sendPutRequest(
-          `checks/${this.product.id}`,
-          {
-            ...body,
-            chequeNumber: +body.chequeNumber,
-          },
-          8080,
-          'v1'
-        )
+        .sendPutRequest(`checks/${this.product.id}`, body, 8080, 'v1')
         .subscribe({
           next: (res) => {
             this.messageService.add({
               severity: 'success',
               summary: 'Successful',
-              detail: 'Cheque Added',
+              detail: 'Cheque Updated',
               life: 3000,
             });
           },
@@ -319,20 +339,28 @@ export class ChequeTableComponent implements OnInit {
     this.deleteProductsDialog = true;
   }
 
-  addCategory() {
-    this.categoryDialog = true;
-  }
+  // addCategory() {
+  //   this.categoryDialog = true;
+  // }
 
   editProduct(product: any) {
     this.product = { ...product };
-
+    console.log('====================================');
+    console.log(product);
+    console.log('====================================');
     const dateOfPay = new Date(product.dateOfPay);
-
     this.chequeForm.patchValue({
       chequeAmount: this.product.chequeAmount,
       chequePayTo: this.product.chequePayTo,
       chequeNumber: this.product.chequeNumber,
       dateOfPay,
+      isPayed: this.product.isPayed
+        ? this.chequeStatusAdd[1]
+        : this.chequeStatusAdd[0],
+      chequeType:
+        this.product.chequeType === 'CREDIT'
+          ? this.chequeTypeAdd[0]
+          : this.chequeTypeAdd[1],
     });
     this.UpdateChequeDialog = true;
   }
@@ -385,8 +413,12 @@ export class ChequeTableComponent implements OnInit {
     this.chequeForm.markAllAsTouched();
     if (this.chequeForm.valid) {
       this.chequeDialog = false;
-      console.log('this.chequeForm.value', this.chequeForm.value);
-      const body = this.chequeForm.value;
+      let body = this.chequeForm.value;
+      body = {
+        ...body,
+        chequeType: this.chequeForm.value.chequeType?.value,
+        isPayed: this.chequeForm.value.isPayed?.value,
+      };
 
       this.https.sendPostRequest('checks', body, 8080, false, 'v1').subscribe({
         next: (res) => {

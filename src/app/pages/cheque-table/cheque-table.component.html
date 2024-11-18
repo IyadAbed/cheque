@@ -1,7 +1,113 @@
 <div class="grid">
   <div class="col-12">
+    <div class="card">
+      <h5>Cheque's Search</h5>
+      <p-accordion>
+        <p-accordionTab
+          header="Search"
+          [selected]="true"
+          class="line-height-3 m-0"
+        >
+          <div class="col-12">
+            <div class="card" [formGroup]="searchForm">
+              <h5>Advanced</h5>
+              <div class="p-fluid p-formgrid grid">
+                <div class="field col-12 md:col-6">
+                  <label htmlFor="chequePayTo">Cheque Pay To</label>
+                  <input pInputText formControlName="chequePayTo" type="text" />
+                </div>
+                <div class="field col-12 md:col-6">
+                  <label htmlFor="chequeNumber">Cheque Number</label>
+                  <input
+                    pInputText
+                    formControlName="chequeNumber"
+                    type="text"
+                  />
+                </div>
+                <div class="field col-12 md:col-4">
+                  <label htmlFor="startChequeAmount">Start Cheque Amount</label>
+                  <p-inputNumber
+                    formControlName="startChequeAmount"
+                    mode="currency"
+                    currency="AED"
+                    required
+                  ></p-inputNumber>
+                </div>
+                <div class="field col-12 md:col-4">
+                  <label htmlFor="endChequeAmount">End Cheque Amount</label>
+                  <p-inputNumber
+                    formControlName="endChequeAmount"
+                    mode="currency"
+                    currency="AED"
+                    required
+                  ></p-inputNumber>
+                </div>
+                <div class="field col-12 md:col-4">
+                  <label htmlFor="state">Cheque Status</label>
+                  <p-dropdown
+                    formControlName="isPayed"
+                    [options]="chequeStatus"
+                    optionLabel="label"
+                  ></p-dropdown>
+                </div>
+                <div class="field col-12 md:col-4">
+                  <label for="price">Start Data</label>
+                  <p-calendar
+                    formControlName="startDateOfPay"
+                    required
+                    [readonlyInput]="true"
+                    dateFormat="dd/mm/yy"
+                  ></p-calendar>
+                </div>
+                <div class="field col-12 md:col-4">
+                  <label for="price">End Data</label>
+                  <p-calendar
+                    formControlName="endDateOfPay"
+                    required
+                    [readonlyInput]="true"
+                    dateFormat="dd/mm/yy"
+                  ></p-calendar>
+                </div>
+                <div class="field col-12 md:col-4">
+                  <label htmlFor="state">Cheque Type</label>
+                  <p-dropdown
+                    formControlName="chequeType"
+                    [options]="chequeType"
+                    optionLabel="label"
+                  ></p-dropdown>
+                </div>
+              </div>
+              <div class="flex w-100 justify-content-end align-items-center">
+                <button
+                  pButton
+                  label="Reset"
+                  (click)="AdvanceSearch(true)"
+                ></button>
+                <button
+                  class="mx-3"
+                  pButton
+                  label="Search"
+                  (click)="AdvanceSearch(false)"
+                ></button>
+              </div>
+            </div>
+          </div>
+        </p-accordionTab>
+      </p-accordion>
+    </div>
+
+    <!-- <div class="p-toolbar-group-right">
+                <p-splitButton label="Options" icon="pi pi-check" [model]="items"></p-splitButton>
+            </div> -->
+  </div>
+  <div class="col-12">
     <div class="card px-6 py-6">
       <p-toast></p-toast>
+      <!-- 
+      for table paginated 
+              [paginator]="true"
+        [rowsPerPageOptions]="[10, 20, 30, 40, 50, 100]"
+      -->
       <p-table
         #dt
         [value]="products"
@@ -9,8 +115,6 @@
         responsiveLayout="scroll"
         [rows]="10"
         [globalFilterFields]="['chequePayTo']"
-        [paginator]="true"
-        [rowsPerPageOptions]="[10, 20, 30, 40, 50, 100]"
         (rowsChange)="getAllCheque($event)"
         [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
@@ -82,9 +186,15 @@
             <th pSortableColumn="chequePayTo">
               Cheque Pay To <p-sortIcon field="chequePayTo"></p-sortIcon>
             </th>
+            <th pSortableColumn="Credit">
+              Credit <p-sortIcon field="Credit"></p-sortIcon>
+            </th>
+            <th pSortableColumn="Debit">
+              Debit <p-sortIcon field="Debit"></p-sortIcon>
+            </th>
             <!-- <th>Image</th> -->
-            <th pSortableColumn="chequeAmount">
-              Cheque Amount <p-sortIcon field="chequeAmount"></p-sortIcon>
+            <th pSortableColumn="Balance">
+              Balance <p-sortIcon field="Balance"></p-sortIcon>
             </th>
             <th pSortableColumn="dateOfPay">
               Date Of Pay <p-sortIcon field="dateOfPay"></p-sortIcon>
@@ -103,41 +213,40 @@
             <td>
               <p-tableCheckbox [value]="product"></p-tableCheckbox>
             </td>
-            <td style="width: 16%; min-width: 10rem">
+            <td style="width: 12%; min-width: 10rem">
               <span class="p-column-title">Cheque Number</span>
 
               {{ product.chequeNumber || product.id }}
             </td>
-            <td style="width: 16%; min-width: 10rem">
+            <td style="width: 12%; min-width: 10rem">
               <span class="p-column-title">Cheque Pay To</span>
               {{ product.chequePayTo }}
             </td>
-            <!-- <td style="width: 16%; min-width: 10rem">
-              <span class="p-column-title">Image</span>
-              <img
-                [src]="'assets/demo/images/product/' + product.image"
-                [alt]="product.name"
-                width="100"
-                class="shadow-4"
-              />
-            </td> -->
-            <td style="width: 16%; min-width: 8rem">
-              <span class="p-column-title">Cheque Amount</span>
-              {{ product.chequeAmount | currency : "USD" }}
+            <td style="width: 12%; min-width: 10rem">
+              <span class="p-column-title">Credit</span>
+              {{
+                product.chequeType == "CREDIT"
+                  ? product.chequeAmount
+                  : (0 | currency : "AED")
+              }}
             </td>
-            <td style="width: 16%; min-width: 10rem">
+            <td style="width: 12%; min-width: 8rem">
+              <span class="p-column-title">Debit</span>
+              {{
+                product.chequeType == "DEBIT"
+                  ? product.chequeAmount
+                  : (0 | currency : "AED")
+              }}
+            </td>
+            <td style="width: 12%; min-width: 8rem">
+              <span class="p-column-title">Balance</span>
+              {{ product.balance | currency : "AED" }}
+            </td>
+            <td style="width: 12%; min-width: 10rem">
               <span class="p-column-title">Date Of Pay</span>
               {{ product.dateOfPay }}
             </td>
-            <!-- <td style="width: 16%; min-width: 10rem">
-              <span class="p-column-title">Reviews</span>
-              <p-rating
-                [ngModel]="product.rating"
-                [readonly]="true"
-                [cancel]="false"
-              ></p-rating>
-            </td> -->
-            <td style="width: 16%; min-width: 10rem">
+            <td style="width: 12%; min-width: 10rem">
               <span class="p-column-title">Is Payed</span>
               <span
                 [class]="
@@ -178,157 +287,6 @@
         </ng-template>
       </p-table>
     </div>
-
-    <p-dialog
-      [(visible)]="productDialog"
-      [style]="{ width: '600px' }"
-      header="Product Details"
-      [modal]="true"
-      class="p-fluid"
-    >
-      <ng-template pTemplate="content">
-        <img
-          [src]="'assets/demo/images/product/' + product.image"
-          [alt]="product.image"
-          width="150"
-          class="mt-0 mx-auto mb-5 block shadow-2"
-          *ngIf="product.image"
-        />
-        <div class="field">
-          <label for="name">Name</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            [(ngModel)]="product.name"
-            required
-            autofocus
-            [ngClass]="{ 'ng-invalid ng-dirty': submitted && !product.name }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div class="field">
-          <label for="description">Description</label>
-          <textarea
-            id="description"
-            pInputTextarea
-            [(ngModel)]="product.description"
-            required
-            rows="3"
-            cols="20"
-          ></textarea>
-        </div>
-        <div class="field">
-          <label for="status">Inventory Status</label>
-          <p-dropdown
-            [(ngModel)]="product.inventoryStatus"
-            inputId="inventoryStatus"
-            optionValue="label"
-            [options]="statuses"
-            placeholder="Select"
-          >
-            <ng-template pTemplate="selectedItem">
-              <span
-                *ngIf="product && product.inventoryStatus"
-                [class]="
-                  'product-badge status-' +
-                  product.inventoryStatus.toString().toLowerCase()
-                "
-                >{{ product.inventoryStatus }}</span
-              >
-            </ng-template>
-            <ng-template let-option pTemplate="item">
-              <span [class]="'product-badge status-' + option.value">{{
-                option.label
-              }}</span>
-            </ng-template>
-          </p-dropdown>
-        </div>
-
-        <div class="field">
-          <label class="mb-3">Category</label>
-          <div class="formgrid grid">
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category1"
-                name="category"
-                value="Accessories"
-                [(ngModel)]="product.category"
-              ></p-radioButton>
-              <label for="category1">Accessories</label>
-            </div>
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category2"
-                name="category"
-                value="Clothing"
-                [(ngModel)]="product.category"
-              ></p-radioButton>
-              <label for="category2">Clothing</label>
-            </div>
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category3"
-                name="category"
-                value="Electronics"
-                [(ngModel)]="product.category"
-              ></p-radioButton>
-              <label for="category3">Electronics</label>
-            </div>
-            <div class="field-radiobutton col-6">
-              <p-radioButton
-                id="category4"
-                name="category"
-                value="Fitness"
-                [(ngModel)]="product.category"
-              ></p-radioButton>
-              <label for="category4">Fitness</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="formgrid grid">
-          <div class="field col">
-            <label for="price">Price</label>
-            <p-inputNumber
-              id="price"
-              [(ngModel)]="product.price"
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-            ></p-inputNumber>
-          </div>
-          <div class="field col">
-            <label for="quantity">Quantity</label>
-            <p-inputNumber
-              id="quantity"
-              [(ngModel)]="product.quantity"
-            ></p-inputNumber>
-          </div>
-        </div>
-      </ng-template>
-
-      <ng-template pTemplate="footer">
-        <button
-          pButton
-          pRipple
-          label="Cancel"
-          icon="pi pi-times"
-          class="p-button-text"
-          (click)="hideDialog()"
-        ></button>
-        <button
-          pButton
-          pRipple
-          label="Save"
-          icon="pi pi-check"
-          class="p-button-text"
-          (click)="saveProduct()"
-        ></button>
-      </ng-template>
-    </p-dialog>
 
     <!-- Add New Cheque -->
     <!-- Add New Cheque -->
@@ -377,33 +335,6 @@
           ></textarea>
         </div>
 
-        <!-- <div class="field">
-          <label for="status">Cheque Status</label>
-          <p-dropdown
-            [(ngModel)]="product.inventoryStatus"
-            inputId="inventoryStatus"
-            optionValue="label"
-            [options]="statuses"
-            placeholder="Select"
-          >
-            <ng-template pTemplate="selectedItem">
-              <span
-                *ngIf="product && product.inventoryStatus"
-                [class]="
-                  'product-badge status-' +
-                  product.inventoryStatus.toString().toLowerCase()
-                "
-                >{{ product.inventoryStatus }}</span
-              >
-            </ng-template>
-            <ng-template let-option pTemplate="item">
-              <span [class]="'product-badge status-' + option.value">{{
-                option.label
-              }}</span>
-            </ng-template>
-          </p-dropdown>
-        </div> -->
-
         <div class="formgrid grid">
           <div class="field col">
             <label for="price">Cheque Amount</label>
@@ -411,13 +342,33 @@
               id="price"
               formControlName="chequeAmount"
               mode="currency"
-              currency="USD"
+              currency="AED"
               locale="en-US"
               required
             ></p-inputNumber>
           </div>
         </div>
-        <div class="formgrid grid mt-8">
+        <div class="formgrid grid">
+          <div class="field col">
+            <label htmlFor="state">Cheque Type</label>
+            <p-dropdown
+              formControlName="chequeType"
+              [options]="chequeTypeAdd"
+              optionLabel="label"
+            ></p-dropdown>
+          </div>
+        </div>
+        <div class="formgrid grid">
+          <div class="field col">
+            <label htmlFor="state">Cheque Status</label>
+            <p-dropdown
+              formControlName="isPayed"
+              [options]="chequeStatusAdd"
+              optionLabel="label"
+            ></p-dropdown>
+          </div>
+        </div>
+        <div class="formgrid grid">
           <div class="field col">
             <label for="price">Cheque Data</label>
             <p-calendar
@@ -531,13 +482,35 @@
               id="price"
               formControlName="chequeAmount"
               mode="currency"
-              currency="USD"
+              currency="AED"
               locale="en-US"
               required
             ></p-inputNumber>
           </div>
         </div>
-        <div class="formgrid grid mt-8">
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label htmlFor="state">Cheque Type</label>
+            <p-dropdown
+              formControlName="chequeType"
+              [options]="chequeTypeAdd"
+              optionLabel="label"
+            ></p-dropdown>
+          </div>
+        </div>
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label htmlFor="state">Cheque Status</label>
+            <p-dropdown
+              formControlName="isPayed"
+              [options]="chequeStatusAdd"
+              optionLabel="label"
+            ></p-dropdown>
+          </div>
+        </div>
+        <div class="formgrid grid">
           <div class="field col">
             <label for="price">Cheque Data</label>
             <p-calendar
