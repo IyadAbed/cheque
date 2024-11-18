@@ -130,7 +130,7 @@
             class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
           >
             <h5 class="m-0">
-              Cheque Balance:
+              Balance:
               {{ products[products.length - 1].balance | currency : "AED" }}
             </h5>
             <div class="flex gap-2">
@@ -191,25 +191,15 @@
             <th pSortableColumn="dateOfPay">
               Date Of Pay <p-sortIcon field="dateOfPay"></p-sortIcon>
             </th>
-            <th pSortableColumn="Debit">
-              Debit <p-sortIcon field="Debit"></p-sortIcon>
-            </th>
-            <th pSortableColumn="Credit">
-              Credit <p-sortIcon field="Credit"></p-sortIcon>
-            </th>
+            <th pSortableColumn="Debit">Debit</th>
+            <th pSortableColumn="Credit">Credit</th>
             <!-- <th>Image</th> -->
-            <th pSortableColumn="Balance">
-              Balance <p-sortIcon field="Balance"></p-sortIcon>
-            </th>
-            <th pSortableColumn="chequeNumber">
-              Cheque Number <p-sortIcon field="chequeNumber"></p-sortIcon>
-            </th>
+            <th pSortableColumn="Balance">Balance</th>
+            <th pSortableColumn="chequeNumber">Cheque Number</th>
             <!-- <th pSortableColumn="rating">
               Reviews <p-sortIcon field="rating"></p-sortIcon>
             </th> -->
-            <th pSortableColumn="isPayed">
-              Is Payed <p-sortIcon field="isPayed"></p-sortIcon>
-            </th>
+            <th pSortableColumn="isPayed">Is Payed</th>
             <th></th>
           </tr>
         </ng-template>
