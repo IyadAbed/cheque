@@ -5,6 +5,7 @@ import { MenuItem, MessageService, SelectItem } from 'primeng/api';
 import { DataView } from 'primeng/dataview';
 import { Table } from 'primeng/table';
 import { HttpService } from '../../http.service';
+import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 
 @Component({
   selector: 'app-cheque-table',
@@ -44,6 +45,10 @@ export class ChequeTableComponent implements OnInit {
   chequeType: any[] = [];
 
   chequeTypeAdd: any[] = [];
+
+  allSuppliers: any[] = [];
+
+  filteredSuppliers: any[] = [];
 
   sortOrder: number = 0;
 
@@ -144,6 +149,20 @@ export class ChequeTableComponent implements OnInit {
     ];
   }
 
+  filterCountry(event: AutoCompleteCompleteEvent) {
+    let filtered: any[] = [];
+    let query = event.query;
+
+    for (let i = 0; i < (this.allSuppliers as any[]).length; i++) {
+      let suppliers = (this.allSuppliers as any[])[i];
+      if (suppliers.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(suppliers);
+      }
+    }
+
+    this.filteredSuppliers = filtered;
+  }
+
   normalizeDate(date: any): string | null {
     if (!date) return null;
     const d = new Date(date);
@@ -162,6 +181,14 @@ export class ChequeTableComponent implements OnInit {
       )
       .subscribe((res) => {
         this.products = res;
+        this.allSuppliers = Array.from(
+          new Set(
+            res.map((chequeData: ChequeContent) => chequeData.chequePayTo)
+          )
+        );
+        console.log('====================================');
+        console.log(this.allSuppliers);
+        console.log('====================================');
       });
   }
 

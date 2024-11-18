@@ -14,7 +14,11 @@
               <div class="p-fluid p-formgrid grid">
                 <div class="field col-12 md:col-6">
                   <label htmlFor="chequePayTo">Cheque Pay To</label>
-                  <input pInputText formControlName="chequePayTo" type="text" />
+                  <p-autoComplete
+                    formControlName="chequePayTo"
+                    [suggestions]="filteredSuppliers"
+                    (completeMethod)="filterCountry($event)"
+                  ></p-autoComplete>
                 </div>
                 <div class="field col-12 md:col-6">
                   <label htmlFor="chequeNumber">Cheque Number</label>
@@ -125,7 +129,10 @@
           <div
             class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
           >
-            <h5 class="m-0">Manage Cheque's</h5>
+            <h5 class="m-0">
+              Cheque Balance:
+              {{ products[products.length - 1].balance | currency : "AED" }}
+            </h5>
             <div class="flex gap-2">
               <span class="block mt-2 md:mt-0 p-input-icon-left">
                 <i class="pi pi-search"></i>
@@ -304,21 +311,11 @@
       >
         <div class="field">
           <label for="name">Pay against</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
+          <p-autoComplete
             formControlName="chequePayTo"
-            required
-            autofocus
-            required
-            [ngClass]="{
-              'ng-invalid ng-dirty': this.chequeForm.get('chequePayTo').valid
-            }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
+            [suggestions]="filteredSuppliers"
+            (completeMethod)="filterCountry($event)"
+          ></p-autoComplete>
         </div>
 
         <div class="field">
@@ -409,21 +406,11 @@
       >
         <div class="field">
           <label for="name">Pay against</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
+          <p-autoComplete
             formControlName="chequePayTo"
-            required
-            autofocus
-            required
-            [ngClass]="{
-              'ng-invalid ng-dirty': this.chequeForm.get('chequePayTo').valid
-            }"
-          />
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
+            [suggestions]="filteredSuppliers"
+            (completeMethod)="filterCountry($event)"
+          ></p-autoComplete>
         </div>
 
         <div class="field">
