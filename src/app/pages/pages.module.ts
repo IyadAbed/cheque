@@ -29,9 +29,10 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ChequeTableComponent } from './cheque-table/cheque-table.component';
+import { ChequeSearchComponent } from './cheque-search/cheque-search.component';
 
 @NgModule({
-  declarations: [ChequeTableComponent],
+  declarations: [ChequeTableComponent, ChequeSearchComponent],
   imports: [
     CommonModule,
     PagesRoutingModule,

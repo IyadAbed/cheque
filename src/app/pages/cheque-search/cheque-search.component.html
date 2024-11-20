@@ -1,114 +1,15 @@
 <div class="grid">
   <div class="col-12">
-    <div class="card">
-      <h5>Balance</h5>
-      <p-accordion>
-        <p-accordionTab header="" [selected]="true" class="line-height-3 m-0">
-          <div class="col-12">
-            <div class="card" [formGroup]="searchForm">
-              <div
-                class="flex w-100 justify-content-between align-items-center"
-              >
-                <h5>Opening Balance: {{ balance | currency : "AED" }}</h5>
-                <button
-                  pButton
-                  label="Update"
-                  (click)="updateBalanceDialog = true"
-                ></button>
-              </div>
-              <!-- <div class="p-fluid p-formgrid grid">
-                <div class="field col-12 md:col-6">
-                  <label htmlFor="chequePayTo">Cheque Pay To</label>
-                  <p-autoComplete
-                    formControlName="chequePayTo"
-                    [suggestions]="filteredSuppliers"
-                    (completeMethod)="filterCountry($event)"
-                  ></p-autoComplete>
-                </div>
-                <div class="field col-12 md:col-6">
-                  <label htmlFor="chequeNumber">Cheque Number</label>
-                  <input
-                    pInputText
-                    formControlName="chequeNumber"
-                    type="text"
-                  />
-                </div>
-                <div class="field col-12 md:col-4">
-                  <label htmlFor="startChequeAmount">Start Cheque Amount</label>
-                  <p-inputNumber
-                    formControlName="startChequeAmount"
-                    mode="currency"
-                    currency="AED"
-                    required
-                  ></p-inputNumber>
-                </div>
-                <div class="field col-12 md:col-4">
-                  <label htmlFor="endChequeAmount">End Cheque Amount</label>
-                  <p-inputNumber
-                    formControlName="endChequeAmount"
-                    mode="currency"
-                    currency="AED"
-                    required
-                  ></p-inputNumber>
-                </div>
-                <div class="field col-12 md:col-4">
-                  <label htmlFor="state">Cheque Status</label>
-                  <p-dropdown
-                    formControlName="isPayed"
-                    [options]="chequeStatus"
-                    optionLabel="label"
-                  ></p-dropdown>
-                </div>
-                <div class="field col-12 md:col-4">
-                  <label for="price">Start Data</label>
-                  <p-calendar
-                    formControlName="startDateOfPay"
-                    required
-                    dateFormat="dd/mm/yy"
-                  ></p-calendar>
-                </div>
-                <div class="field col-12 md:col-4">
-                  <label for="price">End Data</label>
-                  <p-calendar
-                    formControlName="endDateOfPay"
-                    required
-                    dateFormat="dd/mm/yy"
-                  ></p-calendar>
-                </div>
-                <div class="field col-12 md:col-4">
-                  <label htmlFor="state">Cheque Type</label>
-                  <p-dropdown
-                    formControlName="chequeType"
-                    [options]="chequeType"
-                    optionLabel="label"
-                  ></p-dropdown>
-                </div>
-              </div>
-              <div class="flex w-100 justify-content-end align-items-center">
-                <button
-                  pButton
-                  label="Reset"
-                  (click)="AdvanceSearch(true)"
-                ></button>
-                <button
-                  class="mx-3"
-                  pButton
-                  label="Search"
-                  (click)="AdvanceSearch(false)"
-                ></button>
-              </div> -->
-            </div>
-          </div>
-        </p-accordionTab>
-      </p-accordion>
-    </div>
-
-    <!-- <div class="p-toolbar-group-right">
-                <p-splitButton label="Options" icon="pi pi-check" [model]="items"></p-splitButton>
-            </div> -->
-  </div>
-  <div class="col-12">
     <div class="card px-6 py-6">
+      <button
+        pButton
+        pRipple
+        label="Back to Home"
+        icon="pi pi-arrow-left"
+        class="p-button-text my-2"
+        routerLink="/cheque"
+        (click)="this.UpdateChequeDialog = false"
+      ></button>
       <p-toast></p-toast>
       <!-- 
       for table paginated 
@@ -134,10 +35,7 @@
           <div
             class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
           >
-            <h5 class="m-0">
-              Balance:
-              {{ products[products.length - 1].balance | currency : "AED" }}
-            </h5>
+            <h5 class="m-0">Search Table</h5>
             <div class="flex gap-2">
               <span class="block mt-2 md:mt-0 p-input-icon-left">
                 <i class="pi pi-search"></i>
@@ -163,7 +61,7 @@
                 label="Search"
                 icon="pi pi-search"
                 class="p-button-warning"
-                [routerLink]="'/cheque/search'"
+                (click)="searchDialog = true"
               ></button>
               <button
                 pButton
@@ -516,6 +414,145 @@
       </ng-template>
     </p-dialog>
 
+    <!-- Search Cheque -->
+    <!-- Search Cheque -->
+    <!-- Search Cheque -->
+
+    <p-dialog
+      [(visible)]="searchDialog"
+      [style]="{ width: '600px', height: '570px' }"
+      header="Update Cheque"
+      [modal]="true"
+      class="p-fluid"
+      [formGroup]="searchForm"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <div class="field">
+          <label for="name">Pay against</label>
+          <p-autoComplete
+            formControlName="chequePayTo"
+            [suggestions]="filteredSuppliers"
+            (completeMethod)="filterCountry($event)"
+          ></p-autoComplete>
+        </div>
+
+        <div class="field">
+          <label htmlFor="chequeNumber">Cheque Number</label>
+          <input pInputText formControlName="chequeNumber" type="text" />
+        </div>
+
+        <!-- <div class="field">
+          <label for="status">Cheque Status</label>
+          <p-dropdown
+            [(ngModel)]="product.inventoryStatus"
+            inputId="inventoryStatus"
+            optionValue="label"
+            [options]="statuses"
+            placeholder="Select"
+          >
+            <ng-template pTemplate="selectedItem">
+              <span
+                *ngIf="product && product.inventoryStatus"
+                [class]="
+                  'product-badge status-' +
+                  product.inventoryStatus.toString().toLowerCase()
+                "
+                >{{ product.inventoryStatus }}</span
+              >
+            </ng-template>
+            <ng-template let-option pTemplate="item">
+              <span [class]="'product-badge status-' + option.value">{{
+                option.label
+              }}</span>
+            </ng-template>
+          </p-dropdown>
+        </div> -->
+
+        <!-- <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">Cheque Amount</label>
+            <p-inputNumber
+              id="price"
+              formControlName="chequeAmount"
+              mode="currency"
+              currency="AED"
+              locale="en-US"
+              required
+            ></p-inputNumber>
+          </div>
+        </div> -->
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label htmlFor="state">Cheque Type</label>
+            <p-dropdown
+              formControlName="chequeType"
+              [options]="chequeTypeAdd"
+              optionLabel="label"
+            ></p-dropdown>
+          </div>
+        </div>
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label htmlFor="state">Cheque Status</label>
+            <p-dropdown
+              formControlName="isPayed"
+              [options]="chequeStatusAdd"
+              optionLabel="label"
+            ></p-dropdown>
+          </div>
+        </div>
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">Start Data</label>
+            <p-calendar
+              required
+              formControlName="startDateOfPay"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
+          </div>
+        </div>
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">End Data</label>
+            <p-calendar
+              required
+              formControlName="endDateOfPay"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <div class="flex justify-content-between align-items-center mt-1">
+          <button pButton label="Reset" (click)="AdvanceSearch(true)"></button>
+          <div>
+            <button
+              pButton
+              pRipple
+              label="Cancel"
+              icon="pi pi-times"
+              class="p-button-text"
+              (click)="this.UpdateChequeDialog = false"
+            ></button>
+            <button
+              pButton
+              pRipple
+              label="Save"
+              icon="pi pi-check"
+              class="p-button-text"
+              (click)="AdvanceSearch()"
+            ></button>
+          </div>
+        </div>
+      </ng-template>
+    </p-dialog>
+
     <!-- Delete Cheque -->
     <!-- Delete Cheque -->
     <!-- Delete Cheque -->
@@ -586,58 +623,6 @@
           class="p-button-text"
           label="Yes"
           (click)="confirmUpdateStatus()"
-        ></button>
-      </ng-template>
-    </p-dialog>
-
-    <!-- Update Opening -->
-    <!-- Update Opening -->
-    <!-- Update Opening -->
-
-    <p-dialog
-      [(visible)]="updateBalanceDialog"
-      [style]="{ width: '600px', height: '240px' }"
-      header="Update Opening"
-      [modal]="true"
-      [formGroup]="openingForm"
-      class="p-fluid"
-    >
-      <ng-template
-        pTemplate="content"
-        class="flex flex-column justify-content-md-end"
-      >
-        <div class="formgrid grid">
-          <div class="field col">
-            <label for="price"
-              >Current Opening Balance: {{ balance | currency : "AED" }}</label
-            >
-            <p-inputNumber
-              formControlName="initialOpining"
-              mode="currency"
-              currency="AED"
-              locale="en-US"
-              required
-            ></p-inputNumber>
-          </div>
-        </div>
-      </ng-template>
-
-      <ng-template pTemplate="footer">
-        <button
-          pButton
-          pRipple
-          label="Cancel"
-          icon="pi pi-times"
-          class="p-button-text"
-          (click)="updateBalanceDialog = false"
-        ></button>
-        <button
-          pButton
-          pRipple
-          label="Save"
-          icon="pi pi-check"
-          class="p-button-text"
-          (click)="updateOpeningBalance()"
         ></button>
       </ng-template>
     </p-dialog>

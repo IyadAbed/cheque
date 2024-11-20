@@ -11,6 +11,18 @@ export class HttpService {
     this.usersEndPoint = environment.apiEndpoint;
   }
 
+  sendGetRequest(url: string, port: number, version?: 'v1' | 'v2') {
+    const apiUrl = `${this.usersEndPoint}:${port}/api/${
+      version ? version : 'v1'
+    }/${url}`;
+    return this.restService.request({
+      method: 'GET',
+      url: apiUrl,
+      withoutBody: true,
+      showToaster: false,
+    });
+  }
+
   sendPostRequest<TRequest, TResponse>(
     url: string,
     body: any,

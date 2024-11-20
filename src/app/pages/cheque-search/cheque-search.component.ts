@@ -8,17 +8,15 @@ import { HttpService } from '../../http.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 
 @Component({
-  selector: 'app-cheque-table',
-  templateUrl: './cheque-table.component.html',
-  styleUrl: './cheque-table.component.scss',
+  selector: 'app-cheque-search',
+  templateUrl: './cheque-search.component.html',
+  styleUrl: './cheque-search.component.scss',
   providers: [MessageService],
 })
-export class ChequeTableComponent implements OnInit {
+export class ChequeSearchComponent implements OnInit {
   cols: any[] = [];
 
   product: any = {};
-
-  balance: number = 0;
 
   submitted: boolean = false;
 
@@ -31,6 +29,8 @@ export class ChequeTableComponent implements OnInit {
   payChequeDialog: boolean = false;
 
   UpdateChequeDialog: boolean = false;
+
+  searchDialog: boolean = false;
 
   deleteProductsDialog: boolean = false;
 
@@ -60,12 +60,6 @@ export class ChequeTableComponent implements OnInit {
 
   searchForm: FormGroup;
 
-  newUpdate: number;
-
-  updateBalanceDialog: boolean = false;
-
-  openingForm: FormGroup;
-
   constructor(
     private messageService: MessageService,
     private fb: FormBuilder,
@@ -93,16 +87,10 @@ export class ChequeTableComponent implements OnInit {
       isPayed: [null],
       chequeType: [null],
     });
-
-    this.openingForm = fb.group({
-      initialOpining: [0],
-    });
   }
 
   ngOnInit() {
-    this.getBalance();
     // this.getProducts().then((data) => (this.products = data));
-
     this.getAllCheque(10);
     this.searchForm.valueChanges.subscribe(() => {
       console.log('====================================');
@@ -163,14 +151,6 @@ export class ChequeTableComponent implements OnInit {
     ];
   }
 
-  getBalance() {
-    this.https
-      .sendGetRequest('balance/673e634a6a4180145fcb09aa', 8080, 'v1')
-      .subscribe((res: any) => {
-        this.balance = res.initialBalance as number;
-      });
-  }
-
   filterCountry(event: AutoCompleteCompleteEvent) {
     let filtered: any[] = [];
     let query = event.query;
@@ -216,30 +196,6 @@ export class ChequeTableComponent implements OnInit {
       });
   }
 
-  updateOpeningBalance() {
-    console.log(this.openingForm.value);
-
-    // this.https.sendPutRequest(`balance/${}`, {}, 8080, "v1")
-    if (this.openingForm.valid) {
-      this.https
-        .sendPutRequest(
-          'balance/673e634a6a4180145fcb09aa',
-          {
-            initialBalance: this.openingForm?.value?.initialOpining || 0,
-          },
-          8080,
-          'v1'
-        )
-        .subscribe({
-          complete: () => {
-            this.getBalance();
-            this.getAllCheque(10);
-            this.updateBalanceDialog = false;
-          },
-        });
-    }
-  }
-
   AdvanceSearch(reset: boolean) {
     console.log('Form Search', this.searchForm.value);
 
@@ -255,6 +211,7 @@ export class ChequeTableComponent implements OnInit {
         .subscribe((res) => {
           this.products = res.checksSearchResponses;
           this.searchForm.reset();
+          this.searchDialog = false;
         });
     } else {
       let body = this.searchForm.value;
@@ -296,8 +253,11 @@ export class ChequeTableComponent implements OnInit {
           false,
           'v1'
         )
-        .subscribe((res) => {
-          this.products = res.checksSearchResponses;
+        .subscribe({
+          next: (res) => {
+            this.products = res.checksSearchResponses;
+            this.searchDialog = false;
+          },
         });
     }
   }
