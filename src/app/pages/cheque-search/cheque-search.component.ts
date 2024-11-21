@@ -18,6 +18,8 @@ export class ChequeSearchComponent implements OnInit {
 
   product: any = {};
 
+  sum: number;
+
   submitted: boolean = false;
 
   productDialog: boolean = false;
@@ -92,11 +94,6 @@ export class ChequeSearchComponent implements OnInit {
   ngOnInit() {
     // this.getProducts().then((data) => (this.products = data));
     this.getAllCheque(10);
-    this.searchForm.valueChanges.subscribe(() => {
-      console.log('====================================');
-      console.log(this.searchForm.value);
-      console.log('====================================');
-    });
     this.cols = [
       { field: 'product', header: 'Product' },
       { field: 'price', header: 'Price' },
@@ -149,6 +146,23 @@ export class ChequeSearchComponent implements OnInit {
       { label: 'Price High to Low', value: '!price' },
       { label: 'Price Low to High', value: 'price' },
     ];
+  }
+
+  calcSum() {
+    console.log(this.selectedProducts);
+
+    if (this.selectedProducts.length > 0) {
+      let sums = 0;
+      this.selectedProducts.forEach((cheque) => {
+        sums +=
+          cheque.chequeType === 'DEBIT'
+            ? -cheque.chequeAmount
+            : cheque.chequeAmount;
+      });
+      this.sum = sums;
+    } else {
+      this.sum = undefined;
+    }
   }
 
   filterCountry(event: AutoCompleteCompleteEvent) {
@@ -291,7 +305,7 @@ export class ChequeSearchComponent implements OnInit {
           life: 3000,
         });
         this.product = {};
-        this.getAllCheque(10);
+        this.AdvanceSearch(false);
       });
   }
 
@@ -326,7 +340,7 @@ export class ChequeSearchComponent implements OnInit {
           life: 3000,
         });
         this.product = {};
-        this.getAllCheque(10);
+        this.AdvanceSearch(false);
       });
     // this.products = this.products.filter((val) => val.id !== this.product.id);
   }
@@ -357,7 +371,7 @@ export class ChequeSearchComponent implements OnInit {
           complete: () => {
             this.UpdateChequeDialog = false;
             this.chequeForm.reset();
-            this.getAllCheque(10);
+            this.AdvanceSearch(false);
           },
         });
     } else {
@@ -480,7 +494,7 @@ export class ChequeSearchComponent implements OnInit {
         },
         complete: () => {
           this.chequeForm.reset();
-          this.getAllCheque(10);
+          this.AdvanceSearch(false);
         },
       });
     } else {
@@ -493,6 +507,13 @@ export class ChequeSearchComponent implements OnInit {
     }
   }
 
+  onKeydown(event: KeyboardEvent, form: FormGroup) {
+    if (event.key === 'Tab' && this.filteredSuppliers.length > 0) {
+      const firstSuggestion = this.filteredSuppliers[0];
+      form.get('chequePayTo')?.setValue(firstSuggestion);
+      event.preventDefault(); // Prevent default tab behavior
+    }
+  }
   findIndexById(id: string): number {
     let index = -1;
     for (let i = 0; i < this.products.length; i++) {

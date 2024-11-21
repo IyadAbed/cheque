@@ -26,7 +26,7 @@ export class ChequeTableComponent implements OnInit {
 
   chequeDialog: boolean = false;
 
-  sortDirection: 'ASC' | 'DESC' = 'ASC';
+  sortDirection: 'ASC' | 'DESC' = 'DESC';
 
   deleteProductDialog: boolean = false;
 
@@ -203,7 +203,7 @@ export class ChequeTableComponent implements OnInit {
         `checks/list/search`,
         {
           isPayed: false,
-          sortDirection: this.sortDirection === 'ASC' ? 'DESC' : 'ASC',
+          sortDirection: this.sortDirection === 'DESC' ? 'ASC' : 'DESC',
         },
         8080,
         false,
@@ -466,6 +466,14 @@ export class ChequeTableComponent implements OnInit {
     this.submitted = false;
   }
 
+  onKeydown(event: KeyboardEvent, form: FormGroup) {
+    if (event.key === 'Tab' && this.filteredSuppliers.length > 0) {
+      const firstSuggestion = this.filteredSuppliers[0];
+      form.get('chequePayTo')?.setValue(firstSuggestion);
+      event.preventDefault(); // Prevent default tab behavior
+    }
+  }
+
   saveProduct() {
     this.submitted = true;
 
@@ -606,6 +614,7 @@ interface ChequeContent {
   createdAt: string; // Same as above
   updatedAt: string; // Same as above
   deletedAt: string | null; // Nullable for potential absence
+  balance: number;
 }
 
 interface PaginatedChequeResponse {
