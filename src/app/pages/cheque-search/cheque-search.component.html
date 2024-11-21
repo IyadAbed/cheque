@@ -116,7 +116,11 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
-          <tr>
+          <tr
+            [ngClass]="{
+              'bg-red-300': product.chequeType === 'DEBIT'
+            }"
+          >
             <td>
               <p-tableCheckbox [value]="product"></p-tableCheckbox>
             </td>
