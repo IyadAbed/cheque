@@ -26,6 +26,8 @@ export class ChequeTableComponent implements OnInit {
 
   chequeDialog: boolean = false;
 
+  sortDirection: 'ASC' | 'DESC' = 'ASC';
+
   deleteProductDialog: boolean = false;
 
   payChequeDialog: boolean = false;
@@ -103,7 +105,7 @@ export class ChequeTableComponent implements OnInit {
     this.getBalance();
     // this.getProducts().then((data) => (this.products = data));
 
-    this.getAllCheque(10);
+    this.getAllCheque(10, this.sortDirection);
     this.searchForm.valueChanges.subscribe(() => {
       console.log('====================================');
       console.log(this.searchForm.value);
@@ -192,11 +194,17 @@ export class ChequeTableComponent implements OnInit {
     return d.toISOString().split('T')[0]; // Keep only the date part
   }
 
-  getAllCheque(pageSize: any) {
+  getAllCheque(pageSize: any, sort: any) {
+    console.log('====================================');
+    console.log('sfsdfds');
+    console.log('====================================');
     this.https
       .sendPostRequest<ChequeDetailsRes, any>(
         `checks/list/search`,
-        { isPayed: false },
+        {
+          isPayed: false,
+          sortDirection: this.sortDirection === 'ASC' ? 'DESC' : 'ASC',
+        },
         8080,
         false,
         'v1'
@@ -233,7 +241,7 @@ export class ChequeTableComponent implements OnInit {
         .subscribe({
           complete: () => {
             this.getBalance();
-            this.getAllCheque(10);
+            this.getAllCheque(10, this.sortDirection);
             this.updateBalanceDialog = false;
           },
         });
@@ -331,7 +339,7 @@ export class ChequeTableComponent implements OnInit {
           life: 3000,
         });
         this.product = {};
-        this.getAllCheque(10);
+        this.getAllCheque(10, this.sortDirection);
       });
   }
 
@@ -366,7 +374,7 @@ export class ChequeTableComponent implements OnInit {
           life: 3000,
         });
         this.product = {};
-        this.getAllCheque(10);
+        this.getAllCheque(10, this.sortDirection);
       });
     // this.products = this.products.filter((val) => val.id !== this.product.id);
   }
@@ -397,7 +405,7 @@ export class ChequeTableComponent implements OnInit {
           complete: () => {
             this.UpdateChequeDialog = false;
             this.chequeForm.reset();
-            this.getAllCheque(10);
+            this.getAllCheque(10, this.sortDirection);
           },
         });
     } else {
@@ -520,7 +528,7 @@ export class ChequeTableComponent implements OnInit {
         },
         complete: () => {
           this.chequeForm.reset();
-          this.getAllCheque(10);
+          this.getAllCheque(10, this.sortDirection);
         },
       });
     } else {

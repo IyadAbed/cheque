@@ -122,7 +122,7 @@
         responsiveLayout="scroll"
         [rows]="10"
         [globalFilterFields]="['chequePayTo']"
-        (rowsChange)="getAllCheque($event)"
+        (rowsChange)="getAllCheque(10, 'DESC')"
         [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [(selection)]="selectedProducts"
@@ -202,8 +202,11 @@
             <th pSortableColumn="chequePayTo">
               Cheque Pay To <p-sortIcon field="chequePayTo"></p-sortIcon>
             </th>
-            <th pSortableColumn="dateOfPay">
-              Date Of Pay <p-sortIcon field="dateOfPay"></p-sortIcon>
+            <th
+              pSortableColumn="dateOfPay"
+              (click)="getAllCheque(10, !sortDirection)"
+            >
+              Date Of Pay <p-sortIcon></p-sortIcon>
             </th>
             <th pSortableColumn="Debit">Debit</th>
             <th pSortableColumn="Credit">Credit</th>
@@ -218,11 +221,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
-          <tr
-            [ngClass]="{
-              'bg-red-300': product.chequeType === 'DEBIT'
-            }"
-          >
+          <tr>
             <td>
               <p-tableCheckbox [value]="product"></p-tableCheckbox>
             </td>
@@ -234,7 +233,12 @@
               <span class="p-column-title">Date Of Pay</span>
               {{ product.dateOfPay }}
             </td>
-            <td style="width: 14%; min-width: 8rem">
+            <td
+              style="width: 14%; min-width: 8rem"
+              [ngClass]="{
+                'bg-red-300': product.chequeType === 'DEBIT'
+              }"
+            >
               <span class="p-column-title">Debit</span>
               {{
                 product.chequeType == "DEBIT"
@@ -250,7 +254,12 @@
                   : (0 | currency : "AED")
               }}
             </td>
-            <td style="width: 14%; min-width: 8rem">
+            <td
+              style="width: 14%; min-width: 8rem"
+              [ngClass]="{
+                'bg-red-300': product.balance < 0
+              }"
+            >
               <span class="p-column-title">Balance</span>
               {{ product.balance | currency : "AED" }}
             </td>
