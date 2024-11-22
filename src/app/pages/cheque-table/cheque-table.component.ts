@@ -6,12 +6,13 @@ import { DataView } from 'primeng/dataview';
 import { Table } from 'primeng/table';
 import { HttpService } from '../../http.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-cheque-table',
   templateUrl: './cheque-table.component.html',
   styleUrl: './cheque-table.component.scss',
-  providers: [MessageService],
+  providers: [MessageService, DatePipe],
 })
 export class ChequeTableComponent implements OnInit {
   cols: any[] = [];
@@ -35,6 +36,8 @@ export class ChequeTableComponent implements OnInit {
   UpdateChequeDialog: boolean = false;
 
   deleteProductsDialog: boolean = false;
+
+  dateNow: Date;
 
   selectedProducts: any[] = [];
 
@@ -72,8 +75,10 @@ export class ChequeTableComponent implements OnInit {
     private messageService: MessageService,
     private fb: FormBuilder,
     private http: HttpClient,
-    private https: HttpService
+    private https: HttpService,
+    private datePipe: DatePipe
   ) {
+    this.dateNow = new Date();
     this.searchForm = fb.group({
       chequePayTo: [null],
       chequeNumber: [null],
@@ -326,10 +331,20 @@ export class ChequeTableComponent implements OnInit {
     this.payChequeDialog = true;
     this.product = { ...product };
   }
+  formatDate(date: Date): string {
+    return this.datePipe.transform(date, 'yyyy-MM-dd') || '';
+  }
 
-  confirmUpdateStatus(product: ChequeContent) {
+  confirmUpdateStatus() {
+    const dateToPay = this.formatDate(this.dateNow);
+
     this.https
-      .sendPatchRequest(`checks/${this.product.id}/pay`, {}, 8080, 'v1')
+      .sendPatchRequest(
+        `checks/${this.product.id}/pay?latencyDate=${dateToPay}`,
+        {},
+        8080,
+        'v1'
+      )
       .subscribe((res) => {
         this.payChequeDialog = false;
         this.messageService.add({

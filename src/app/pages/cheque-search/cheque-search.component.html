@@ -628,14 +628,28 @@
       [(visible)]="payChequeDialog"
       header="Confirm"
       [modal]="true"
-      [style]="{ width: '450px' }"
+      [style]="{ width: '450px', height: '700px' }"
     >
-      <div class="flex align-items-center justify-content-center">
-        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-        <span *ngIf="product"
-          >Are you sure you want to Pay
-          <b>{{ product.chequePayTo }}</b> Cheque?</span
-        >
+      <div class="flex flex-column align-items-center justify-content-center">
+        <div class="flex align-items-center justify-content-center">
+          <i
+            class="pi pi-exclamation-triangle mr-3"
+            style="font-size: 2rem"
+          ></i>
+          <span *ngIf="product"
+            >Are you sure you want to Pay
+            <b>{{ product.chequePayTo }}</b> Cheque?</span
+          >
+        </div>
+        <br />
+        <div class="field flex flex-column col-12">
+          <label for="price">Pay Data</label>
+          <p-calendar
+            [(ngModel)]="dateNow"
+            #payDate
+            dateFormat="dd/mm/yy"
+          ></p-calendar>
+        </div>
       </div>
       <ng-template pTemplate="footer">
         <button

@@ -6,12 +6,13 @@ import { DataView } from 'primeng/dataview';
 import { Table } from 'primeng/table';
 import { HttpService } from '../../http.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-cheque-search',
   templateUrl: './cheque-search.component.html',
   styleUrl: './cheque-search.component.scss',
-  providers: [MessageService],
+  providers: [MessageService, DatePipe],
 })
 export class ChequeSearchComponent implements OnInit {
   cols: any[] = [];
@@ -19,6 +20,8 @@ export class ChequeSearchComponent implements OnInit {
   product: any = {};
 
   sum: number;
+
+  dateNow: Date;
 
   submitted: boolean = false;
 
@@ -66,8 +69,11 @@ export class ChequeSearchComponent implements OnInit {
     private messageService: MessageService,
     private fb: FormBuilder,
     private http: HttpClient,
-    private https: HttpService
+    private https: HttpService,
+    private datePipe: DatePipe
   ) {
+    this.dateNow = new Date();
+
     this.searchForm = fb.group({
       chequePayTo: [null],
       chequeNumber: [null],
@@ -293,9 +299,20 @@ export class ChequeSearchComponent implements OnInit {
     this.product = { ...product };
   }
 
-  confirmUpdateStatus(product: ChequeContent) {
+  formatDate(date: Date): string {
+    return this.datePipe.transform(date, 'yyyy-MM-dd') || '';
+  }
+
+  confirmUpdateStatus() {
+    const dateToPay = this.formatDate(this.dateNow);
+
     this.https
-      .sendPatchRequest(`checks/${this.product.id}/pay`, {}, 8080, 'v1')
+      .sendPatchRequest(
+        `checks/${this.product.id}/pay?latencyDate=${dateToPay}`,
+        {},
+        8080,
+        'v1'
+      )
       .subscribe((res) => {
         this.payChequeDialog = false;
         this.messageService.add({
@@ -305,7 +322,7 @@ export class ChequeSearchComponent implements OnInit {
           life: 3000,
         });
         this.product = {};
-        this.AdvanceSearch(false);
+        this.getAllCheque(10);
       });
   }
 
