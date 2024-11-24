@@ -200,21 +200,9 @@ export class ChequeTableComponent implements OnInit {
   }
 
   getAllCheque(pageSize: any, sort: any) {
-    console.log('====================================');
-    console.log('sfsdfds');
-    console.log('====================================');
     this.https
-      .sendPostRequest<ChequeDetailsRes, any>(
-        `checks/list/search`,
-        {
-          isPayed: false,
-          sortDirection: this.sortDirection === 'DESC' ? 'ASC' : 'DESC',
-        },
-        8080,
-        false,
-        'v1'
-      )
-      .subscribe((res) => {
+      .sendGetRequest(`checks/balance?sortDirection=ASC`, 8080, 'v1')
+      .subscribe((res: any) => {
         this.products = res.checksSearchResponses;
         this.allSuppliers = Array.from(
           new Set(
