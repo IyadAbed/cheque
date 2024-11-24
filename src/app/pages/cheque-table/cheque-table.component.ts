@@ -201,7 +201,13 @@ export class ChequeTableComponent implements OnInit {
 
   getAllCheque(pageSize: any, sort: any) {
     this.https
-      .sendGetRequest(`checks/balance?sortDirection=ASC`, 8080, 'v1')
+      .sendPostRequest(
+        `checks/list/search`,
+        { sortDirection: 'ASC' },
+        8080,
+        false,
+        'v1'
+      )
       .subscribe((res: any) => {
         this.products = res.checksSearchResponses;
         this.allSuppliers = Array.from(

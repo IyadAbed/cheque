@@ -231,7 +231,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
-          <tr>
+          <tr *ngIf="!product.isPayed">
             <td>
               <p-tableCheckbox [value]="product"></p-tableCheckbox>
             </td>
