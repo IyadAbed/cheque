@@ -7,6 +7,7 @@ import { Table } from 'primeng/table';
 import { HttpService } from '../../http.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { DatePipe } from '@angular/common';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-cheque-table',
@@ -20,6 +21,8 @@ export class ChequeTableComponent implements OnInit {
   product: any = {};
 
   balance: number = 0;
+
+  currentBalance: number = 0;
 
   submitted: boolean = false;
 
@@ -107,6 +110,7 @@ export class ChequeTableComponent implements OnInit {
   }
 
   ngOnInit() {
+    // this.https.sendPutRequest('checks/edit', {}, 8080, 'v1').subscribe();
     this.getBalance();
     // this.getProducts().then((data) => (this.products = data));
 
@@ -175,6 +179,7 @@ export class ChequeTableComponent implements OnInit {
       .sendGetRequest('balance/673e634a6a4180145fcb09aa', 8080, 'v1')
       .subscribe((res: any) => {
         this.balance = res.initialBalance as number;
+        this.currentBalance = this.balance;
       });
   }
 
@@ -208,6 +213,31 @@ export class ChequeTableComponent implements OnInit {
         false,
         'v1'
       )
+      .pipe(
+        map((res: any) => {
+          this.currentBalance = this.balance;
+          res.checksSearchResponses.forEach((cheque: ChequeContent) => {
+            if (cheque.isPayed) {
+              this.currentBalance +=
+                cheque.chequeType === 'DEBIT'
+                  ? -cheque.chequeAmount
+                  : cheque.chequeAmount;
+            }
+          });
+          let runningBalance = this.currentBalance;
+          res.checksSearchResponses = res.checksSearchResponses.map(
+            (cheque: ChequeContent, index: number) => {
+              // Calculate the balance for each cheque
+              runningBalance +=
+                cheque.chequeType === 'DEBIT'
+                  ? -cheque.chequeAmount
+                  : cheque.chequeAmount;
+              return { ...cheque, balance: runningBalance }; // Update the balance
+            }
+          );
+          return res;
+        })
+      )
       .subscribe((res: any) => {
         this.products = res.checksSearchResponses;
         this.allSuppliers = Array.from(
@@ -217,9 +247,6 @@ export class ChequeTableComponent implements OnInit {
             )
           )
         );
-        console.log('====================================');
-        console.log(this.allSuppliers);
-        console.log('====================================');
       });
   }
 
@@ -618,6 +645,7 @@ interface ChequeContent {
   chequePayTo: string;
   chequeNumber: number;
   dateOfPay: string; // Use `Date` if you intend to parse it as a `Date` object
+  chequeType: 'DEBIT' | 'CREDIT';
   isPayed: boolean;
   latencyDate: string; // Same as above
   createdAt: string; // Same as above

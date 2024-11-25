@@ -57,6 +57,10 @@ export class ChequeSearchComponent implements OnInit {
 
   filteredSuppliers: any[] = [];
 
+  totalCredit: number = 0;
+
+  totalDebit: number = 0;
+
   sortOrder: number = 0;
 
   sortField: string = '';
@@ -223,15 +227,22 @@ export class ChequeSearchComponent implements OnInit {
       this.https
         .sendPostRequest<ChequeDetailsRes, any>(
           `checks/list/search`,
-          {},
+          { sortDirection: 'ASC' },
           8080,
           false,
           'v1'
         )
-        .subscribe((res) => {
+        .subscribe((res: any) => {
           this.products = res.checksSearchResponses;
           this.searchForm.reset();
           this.searchDialog = false;
+          this.totalDebit = res.checksSearchResponses
+            .filter((cheque) => cheque.chequeType === 'DEBIT')
+            .reduce((sum, cheque) => sum + cheque.chequeAmount, 0);
+
+          this.totalCredit = res.checksSearchResponses
+            .filter((cheque) => cheque.chequeType === 'CREDIT')
+            .reduce((sum, cheque) => sum + cheque.chequeAmount, 0);
         });
     } else {
       let body = this.searchForm.value;
@@ -268,7 +279,7 @@ export class ChequeSearchComponent implements OnInit {
       this.https
         .sendPostRequest<ChequeDetailsRes, any>(
           `checks/list/search`,
-          body,
+          { ...body, sortDirection: 'ASC' },
           8080,
           false,
           'v1'
@@ -277,6 +288,13 @@ export class ChequeSearchComponent implements OnInit {
           next: (res) => {
             this.products = res.checksSearchResponses;
             this.searchDialog = false;
+            this.totalDebit = res.checksSearchResponses;
+            //   .filter((cheque) => cheque.chequeType === 'DEBIT')
+            //   .reduce((sum, cheque) => sum + cheque.chequeAmount, 0);
+
+            // this.totalCredit = res.checksSearchResponses
+            //   .filter((cheque) => cheque.chequeType === 'CREDIT')
+            //   .reduce((sum, cheque) => sum + cheque.chequeAmount, 0);
           },
         });
     }
