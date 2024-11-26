@@ -24,6 +24,8 @@ export class ChequeTableComponent implements OnInit {
 
   currentBalance: number = 0;
 
+  runningBalance: number = 0;
+
   submitted: boolean = false;
 
   productDialog: boolean = false;
@@ -224,21 +226,25 @@ export class ChequeTableComponent implements OnInit {
                   : cheque.chequeAmount;
             }
           });
-          let runningBalance = this.currentBalance;
+          this.runningBalance = this.currentBalance;
+          console.log('runningBalance', this.runningBalance);
+
           res.checksSearchResponses = res.checksSearchResponses.map(
             (cheque: ChequeContent, index: number) => {
               // Calculate the balance for each cheque
-              runningBalance +=
+              this.runningBalance +=
                 cheque.chequeType === 'DEBIT'
-                  ? -cheque.chequeAmount
-                  : cheque.chequeAmount;
-              return { ...cheque, balance: runningBalance }; // Update the balance
+                  ? +cheque.chequeAmount
+                  : -cheque.chequeAmount;
+              return { ...cheque, balance: this.runningBalance }; // Update the balance
             }
           );
           return res;
         })
       )
       .subscribe((res: any) => {
+        console.log(this.runningBalance);
+
         this.products = res.checksSearchResponses;
         this.allSuppliers = Array.from(
           new Set(
