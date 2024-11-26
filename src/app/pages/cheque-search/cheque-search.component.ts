@@ -7,6 +7,7 @@ import { Table } from 'primeng/table';
 import { HttpService } from '../../http.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { DatePipe } from '@angular/common';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-cheque-search',
@@ -113,8 +114,8 @@ export class ChequeSearchComponent implements OnInit {
     ];
 
     this.chequeStatusAdd = [
-      { label: 'Not Payed', value: false },
-      { label: 'Payed', value: true },
+      { label: 'Not Pass', value: false },
+      { label: 'Pass', value: true },
     ];
     this.chequeTypeAdd = [
       { label: 'Credit', value: 'CREDIT' },
@@ -122,8 +123,8 @@ export class ChequeSearchComponent implements OnInit {
     ];
     this.chequeStatus = [
       { label: 'All', value: null },
-      { label: 'Payed', value: true },
-      { label: 'Not Payed', value: false },
+      { label: 'Pass', value: true },
+      { label: 'Not Pass', value: false },
     ];
     this.chequeType = [
       { label: 'All', value: null },
@@ -236,13 +237,20 @@ export class ChequeSearchComponent implements OnInit {
           this.products = res.checksSearchResponses;
           this.searchForm.reset();
           this.searchDialog = false;
-          this.totalDebit = res.checksSearchResponses
-            .filter((cheque) => cheque.chequeType === 'DEBIT')
-            .reduce((sum, cheque) => sum + cheque.chequeAmount, 0);
-
-          this.totalCredit = res.checksSearchResponses
-            .filter((cheque) => cheque.chequeType === 'CREDIT')
-            .reduce((sum, cheque) => sum + cheque.chequeAmount, 0);
+          const depCre = res.checksSearchResponses.reduce(
+            (acc, item) => {
+              if (item.chequeType === 'CREDIT') {
+                acc.creditSum += item.chequeAmount;
+              } else if (item.chequeType === 'DEBIT') {
+                acc.debitSum += item.chequeAmount;
+              }
+              return acc;
+            },
+            { creditSum: 0, debitSum: 0 } // Initial sums
+          );
+          console.log('depCre', depCre);
+          this.totalDebit = depCre.debitSum;
+          this.totalCredit = depCre.creditSum;
         });
     } else {
       let body = this.searchForm.value;
@@ -288,13 +296,20 @@ export class ChequeSearchComponent implements OnInit {
           next: (res) => {
             this.products = res.checksSearchResponses;
             this.searchDialog = false;
-            this.totalDebit = res.checksSearchResponses;
-            //   .filter((cheque) => cheque.chequeType === 'DEBIT')
-            //   .reduce((sum, cheque) => sum + cheque.chequeAmount, 0);
-
-            // this.totalCredit = res.checksSearchResponses
-            //   .filter((cheque) => cheque.chequeType === 'CREDIT')
-            //   .reduce((sum, cheque) => sum + cheque.chequeAmount, 0);
+            const depCre = res.checksSearchResponses.reduce(
+              (acc, item) => {
+                if (item.chequeType === 'CREDIT') {
+                  acc.creditSum += item.chequeAmount;
+                } else if (item.chequeType === 'DEBIT') {
+                  acc.debitSum += item.chequeAmount;
+                }
+                return acc;
+              },
+              { creditSum: 0, debitSum: 0 } // Initial sums
+            );
+            console.log('depCre', depCre);
+            this.totalDebit = depCre.debitSum;
+            this.totalCredit = depCre.creditSum;
           },
         });
     }
@@ -609,11 +624,13 @@ interface ChequeContent {
   chequePayTo: string;
   chequeNumber: number;
   dateOfPay: string; // Use `Date` if you intend to parse it as a `Date` object
+  chequeType: 'DEBIT' | 'CREDIT';
   isPayed: boolean;
   latencyDate: string; // Same as above
   createdAt: string; // Same as above
   updatedAt: string; // Same as above
   deletedAt: string | null; // Nullable for potential absence
+  balance: number;
 }
 
 interface PaginatedChequeResponse {

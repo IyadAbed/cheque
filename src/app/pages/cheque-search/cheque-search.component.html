@@ -219,20 +219,49 @@
             </td>
           </tr>
         </ng-template>
-        <!-- <ng-template pTemplate="footer">
+        <ng-template pTemplate="footer">
           <tr>
-            <td colspan="3" style="text-align: right; font-weight: bold">
+            <td
+              colspan="3"
+              style="
+                width: 28%;
+                min-width: 10rem;
+                text-align: left;
+                font-weight: bold;
+              "
+            >
               Total:
             </td>
-            <td style="color: red; text-align: center">
+            <td
+              style="color: red; text-align: left; width: 14%; min-width: 10rem"
+            >
               ( {{ totalDebit | currency : "AED" }} )
             </td>
-            <td style="text-align: center">
+            <td style="text-align: left; width: 14%; min-width: 10rem">
               {{ totalCredit | currency : "AED" }}
+            </td>
+            <td
+              style="text-align: left; width: 14%; min-width: 10rem"
+              [ngClass]="{
+                'color-Red': products[products.length - 1].balance < 0
+              }"
+            >
+              <span *ngIf="products[products.length - 1].balance < 0">
+                (
+                {{
+                  products[products.length - 1].balance * -1 | currency : "AED"
+                }}
+                )
+              </span>
+              <span *ngIf="products[products.length - 1].balance > 0">
+                {{
+                  products[products.length - 1].balance | currency : "AED"
+                }}
+              </span>
             </td>
             <td colspan="3"></td>
           </tr>
-        </ng-template> -->
+        </ng-template>
       </p-table>
     </div>
 
@@ -283,21 +312,31 @@
         <div class="formgrid grid">
           <div class="field col">
             <label htmlFor="state">Cheque Type</label>
-            <p-dropdown
+            <p-selectButton
               formControlName="chequeType"
               [options]="chequeTypeAdd"
               optionLabel="label"
-            ></p-dropdown>
+            ></p-selectButton>
+            <!-- <p-dropdown
+              formControlName="chequeType"
+              [options]="chequeTypeAdd"
+              optionLabel="label"
+            ></p-dropdown> -->
           </div>
         </div>
         <div class="formgrid grid">
           <div class="field col">
             <label htmlFor="state">Cheque Status</label>
-            <p-dropdown
+            <p-selectButton
+              [options]="chequeStatusAdd"
+              formControlName="isPayed"
+              optionLabel="label"
+            ></p-selectButton>
+            <!-- <p-dropdown
               formControlName="isPayed"
               [options]="chequeStatusAdd"
               optionLabel="label"
-            ></p-dropdown>
+            ></p-dropdown> -->
           </div>
         </div>
         <div class="formgrid grid">
@@ -407,22 +446,32 @@
         <div class="formgrid grid">
           <div class="field col">
             <label htmlFor="state">Cheque Type</label>
-            <p-dropdown
+            <p-selectButton
               formControlName="chequeType"
               [options]="chequeTypeAdd"
               optionLabel="label"
-            ></p-dropdown>
+            ></p-selectButton>
+            <!-- <p-dropdown
+              formControlName="chequeType"
+              [options]="chequeTypeAdd"
+              optionLabel="label"
+            ></p-dropdown> -->
           </div>
         </div>
 
         <div class="formgrid grid">
           <div class="field col">
             <label htmlFor="state">Cheque Status</label>
-            <p-dropdown
+            <p-selectButton
+              [options]="chequeStatusAdd"
+              formControlName="isPayed"
+              optionLabel="label"
+            ></p-selectButton>
+            <!-- <p-dropdown
               formControlName="isPayed"
               [options]="chequeStatusAdd"
               optionLabel="label"
-            ></p-dropdown>
+            ></p-dropdown> -->
           </div>
         </div>
         <div class="formgrid grid">
@@ -464,7 +513,7 @@
     <p-dialog
       [(visible)]="searchDialog"
       [style]="{ width: '600px', height: '570px' }"
-      header="Update Cheque"
+      header="Search"
       [modal]="true"
       class="p-fluid"
       [formGroup]="searchForm"
@@ -532,22 +581,32 @@
         <div class="formgrid grid">
           <div class="field col">
             <label htmlFor="state">Cheque Type</label>
-            <p-dropdown
+            <p-selectButton
               formControlName="chequeType"
               [options]="chequeTypeAdd"
               optionLabel="label"
-            ></p-dropdown>
+            ></p-selectButton>
+            <!-- <p-dropdown
+              formControlName="chequeType"
+              [options]="chequeTypeAdd"
+              optionLabel="label"
+            ></p-dropdown> -->
           </div>
         </div>
 
         <div class="formgrid grid">
           <div class="field col">
             <label htmlFor="state">Cheque Status</label>
-            <p-dropdown
+            <p-selectButton
+              [options]="chequeStatusAdd"
+              formControlName="isPayed"
+              optionLabel="label"
+            ></p-selectButton>
+            <!-- <p-dropdown
               formControlName="isPayed"
               [options]="chequeStatusAdd"
               optionLabel="label"
-            ></p-dropdown>
+            ></p-dropdown> -->
           </div>
         </div>
         <div class="formgrid grid">

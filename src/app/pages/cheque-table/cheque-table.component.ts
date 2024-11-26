@@ -56,6 +56,10 @@ export class ChequeTableComponent implements OnInit {
 
   chequeType: any[] = [];
 
+  totalCredit: number = 0;
+
+  totalDebit: number = 0;
+
   chequeTypeAdd: any[] = [];
 
   allSuppliers: any[] = [];
@@ -131,8 +135,8 @@ export class ChequeTableComponent implements OnInit {
     ];
 
     this.chequeStatusAdd = [
-      { label: 'Not Payed', value: false },
-      { label: 'Payed', value: true },
+      { label: 'Not Pass', value: false },
+      { label: 'Pass', value: true },
     ];
     this.chequeTypeAdd = [
       { label: 'Credit', value: 'CREDIT' },
@@ -140,8 +144,8 @@ export class ChequeTableComponent implements OnInit {
     ];
     this.chequeStatus = [
       { label: 'All', value: null },
-      { label: 'Payed', value: true },
-      { label: 'Not Payed', value: false },
+      { label: 'Pass', value: true },
+      { label: 'Not Pass', value: false },
     ];
     this.chequeType = [
       { label: 'All', value: null },
@@ -227,25 +231,6 @@ export class ChequeTableComponent implements OnInit {
             }
           });
           this.runningBalance = this.currentBalance;
-          console.log('runningBalance', this.runningBalance);
-
-          // res.checksSearchResponses = res.checksSearchResponses.map(
-          //   (cheque: ChequeContent, index: number) => {
-          //     // Calculate the balance for each cheque
-          //     console.log('====================================');
-          //     console.log(
-          //       cheque.chequeType == 'DEBIT'
-          //         ? -cheque.chequeAmount
-          //         : cheque.chequeAmount
-          //     );
-          //     console.log('====================================');
-          //     this.runningBalance +=
-          //       cheque.chequeType == 'DEBIT'
-          //         ? -cheque.chequeAmount
-          //         : cheque.chequeAmount;
-          //     return { ...cheque, balance: this.runningBalance }; // Update the balance
-          //   }
-          // );
           return res;
         })
       )
@@ -260,6 +245,20 @@ export class ChequeTableComponent implements OnInit {
             )
           )
         );
+        const depCre = res.checksSearchResponses.reduce(
+          (acc, item) => {
+            if (item.chequeType === 'CREDIT' && !item.isPayed) {
+              acc.creditSum += item.chequeAmount;
+            } else if (item.chequeType === 'DEBIT' && !item.isPayed) {
+              acc.debitSum += item.chequeAmount;
+            }
+            return acc;
+          },
+          { creditSum: 0, debitSum: 0 } // Initial sums
+        );
+        console.log('depCre', depCre);
+        this.totalDebit = depCre.debitSum;
+        this.totalCredit = depCre.creditSum;
       });
   }
 
@@ -301,6 +300,20 @@ export class ChequeTableComponent implements OnInit {
         )
         .subscribe((res) => {
           this.products = res.checksSearchResponses;
+          const depCre = res.checksSearchResponses.reduce(
+            (acc, item) => {
+              if (item.chequeType === 'CREDIT') {
+                acc.creditSum += item.chequeAmount;
+              } else if (item.chequeType === 'DEBIT') {
+                acc.debitSum += item.chequeAmount;
+              }
+              return acc;
+            },
+            { creditSum: 0, debitSum: 0 } // Initial sums
+          );
+          console.log('depCre', depCre);
+          this.totalDebit = depCre.debitSum;
+          this.totalCredit = depCre.creditSum;
           this.searchForm.reset();
         });
     } else {
@@ -345,6 +358,20 @@ export class ChequeTableComponent implements OnInit {
         )
         .subscribe((res) => {
           this.products = res.checksSearchResponses;
+          const depCre = res.checksSearchResponses.reduce(
+            (acc, item) => {
+              if (item.chequeType === 'CREDIT') {
+                acc.creditSum += item.chequeAmount;
+              } else if (item.chequeType === 'DEBIT') {
+                acc.debitSum += item.chequeAmount;
+              }
+              return acc;
+            },
+            { creditSum: 0, debitSum: 0 } // Initial sums
+          );
+          console.log('depCre', depCre);
+          this.totalDebit = depCre.debitSum;
+          this.totalCredit = depCre.creditSum;
         });
     }
   }

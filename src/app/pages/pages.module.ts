@@ -30,6 +30,7 @@ import { ToastModule } from 'primeng/toast';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ChequeTableComponent } from './cheque-table/cheque-table.component';
 import { ChequeSearchComponent } from './cheque-search/cheque-search.component';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [ChequeTableComponent, ChequeSearchComponent],
@@ -64,6 +65,7 @@ import { ChequeSearchComponent } from './cheque-search/cheque-search.component';
     DialogModule,
     ToastModule,
     RadioButtonModule,
+    SelectButtonModule,
   ],
 })
 export class PagesModule {}
