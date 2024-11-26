@@ -215,6 +215,20 @@ export class ChequeSearchComponent implements OnInit {
             )
           )
         );
+        const depCre = res.checksSearchResponses.reduce(
+          (acc, item) => {
+            if (item.chequeType === 'CREDIT') {
+              acc.creditSum += item.chequeAmount;
+            } else if (item.chequeType === 'DEBIT') {
+              acc.debitSum += item.chequeAmount;
+            }
+            return acc;
+          },
+          { creditSum: 0, debitSum: 0 } // Initial sums
+        );
+        console.log('depCre', depCre);
+        this.totalDebit = depCre.debitSum;
+        this.totalCredit = depCre.creditSum;
         console.log('====================================');
         console.log(this.allSuppliers);
         console.log('====================================');
