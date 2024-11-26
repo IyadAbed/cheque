@@ -229,16 +229,23 @@ export class ChequeTableComponent implements OnInit {
           this.runningBalance = this.currentBalance;
           console.log('runningBalance', this.runningBalance);
 
-          res.checksSearchResponses = res.checksSearchResponses.map(
-            (cheque: ChequeContent, index: number) => {
-              // Calculate the balance for each cheque
-              this.runningBalance +=
-                cheque.chequeType === 'DEBIT'
-                  ? +cheque.chequeAmount
-                  : -cheque.chequeAmount;
-              return { ...cheque, balance: this.runningBalance }; // Update the balance
-            }
-          );
+          // res.checksSearchResponses = res.checksSearchResponses.map(
+          //   (cheque: ChequeContent, index: number) => {
+          //     // Calculate the balance for each cheque
+          //     console.log('====================================');
+          //     console.log(
+          //       cheque.chequeType == 'DEBIT'
+          //         ? -cheque.chequeAmount
+          //         : cheque.chequeAmount
+          //     );
+          //     console.log('====================================');
+          //     this.runningBalance +=
+          //       cheque.chequeType == 'DEBIT'
+          //         ? -cheque.chequeAmount
+          //         : cheque.chequeAmount;
+          //     return { ...cheque, balance: this.runningBalance }; // Update the balance
+          //   }
+          // );
           return res;
         })
       )
