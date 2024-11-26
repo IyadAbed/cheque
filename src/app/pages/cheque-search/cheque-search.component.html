@@ -141,11 +141,7 @@
             </td>
             <td style="width: 14%; min-width: 8rem color-Red">
               <span class="p-column-title">Debit</span>
-              <p
-                [ngClass]="{
-                  'color-Red': product.chequeType === 'DEBIT'
-                }"
-              >
+              <p>
                 <span *ngIf="product.chequeType == 'DEBIT'">
                   ( {{ product.chequeAmount | currency : "AED" }} )
                 </span>
@@ -232,9 +228,7 @@
             >
               Total:
             </td>
-            <td
-              style="color: red; text-align: left; width: 14%; min-width: 10rem"
-            >
+            <td style="text-align: left; width: 14%; min-width: 10rem">
               ( {{ totalDebit | currency : "AED" }} )
             </td>
             <td style="text-align: left; width: 14%; min-width: 10rem">
@@ -254,9 +248,7 @@
                 )
               </span>
               <span *ngIf="products[products.length - 1].balance > 0">
-                {{
-                  products[products.length - 1].balance | currency : "AED"
-                }}
+                {{ products[products.length - 1].balance | currency : "AED" }}
               </span>
             </td>
             <td colspan="3"></td>
