@@ -35,7 +35,7 @@ export class LayoutService {
   config = signal<AppConfig>(this._config);
 
   state: LayoutState = {
-    staticMenuDesktopInactive: true,
+    staticMenuDesktopInactive: false, //true
     overlayMenuActive: false,
     profileSidebarVisible: false,
     configSidebarVisible: false,

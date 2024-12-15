@@ -1,0 +1,139 @@
+<div class="col-12">
+  <div class="card">
+    <!-- <h5>Advanced</h5> -->
+    <div class="p-fluid p-formgrid grid" [formGroup]="invoiceForm">
+      <div class="field col-12 md:col-4">
+        <label for="supplierId">Supplier</label>
+        <p-autoComplete
+          formControlName="supplierId"
+          [suggestions]="filteredSuppliers"
+          (completeMethod)="filterCountry($event, 'supplier')"
+          (keydown)="onKeydown($event, invoiceForm, 'supplier')"
+        ></p-autoComplete>
+      </div>
+      <div class="field col-12 md:col-4">
+        <label for="supplierId">Project</label>
+        <p-autoComplete
+          formControlName="projectId"
+          [suggestions]="filteredProjects"
+          (completeMethod)="filterCountry($event, 'project')"
+          (keydown)="onKeydown($event, invoiceForm, 'project')"
+        ></p-autoComplete>
+      </div>
+      <div class="field col-12 md:col-4">
+        <label htmlFor="number">Invoice Number</label>
+        <input pInputText formControlName="number" type="text" />
+      </div>
+
+      <div formArrayName="items" class="field col-12 md:col-12">
+        <div
+          class="p-fluid p-formgrid grid"
+          *ngFor="let control of items.controls; let i = index"
+          [formGroupName]="i"
+        >
+          <div class="field col-12 md:col-4">
+            <label for="supplierId">Item</label>
+            <p-autoComplete
+              formControlName="itemId"
+              [suggestions]="filteredItem"
+              (completeMethod)="filterCountry($event, 'item')"
+              (keydown)="onKeydown($event, control, 'item')"
+            ></p-autoComplete>
+          </div>
+
+          <div class="field col-12 md:col-4">
+            <label htmlFor="itemDescription">Item Description</label>
+            <input pInputText formControlName="itemDescription" type="text" />
+          </div>
+          <div class="field col-12 md:col-4">
+            <label htmlFor="quantity">Item quantity</label>
+            <p-inputNumber
+              id="amount"
+              formControlName="quantity"
+              locale="en-US"
+              required
+            ></p-inputNumber>
+          </div>
+          <div class="field col-12 md:col-4">
+            <label htmlFor="price">Item price</label>
+            <p-inputNumber
+              id="amount"
+              formControlName="price"
+              mode="currency"
+              currency="AED"
+              locale="en-US"
+              required
+            ></p-inputNumber>
+          </div>
+          <div class="field col-12 md:col-4">
+            <label htmlFor="total">Total</label>
+            <p-inputNumber
+              id="amount"
+              formControlName="total"
+              mode="currency"
+              currency="AED"
+              locale="en-US"
+              required
+            ></p-inputNumber>
+          </div>
+          <div class="field col-12 md:col-4 align-items-center">
+            <button
+              pButton
+              pRipple
+              icon="pi pi-times"
+              class="p-button-text"
+              (click)="removeItem(i)"
+            ></button>
+          </div>
+        </div>
+      </div>
+      <div class="field col-12 md:col-12">
+        <button
+          pButton
+          pRipple
+          label="Add Item To Invoice"
+          icon="pi pi-plus"
+          class="p-button-text"
+          (click)="generateNewItem()"
+        ></button>
+      </div>
+      <div class="field col-12 md:col-4">
+        <label>Invoice Date</label>
+        <p-calendar
+          required
+          formControlName="invoiceDate"
+          dateFormat="dd/mm/yy"
+        ></p-calendar>
+      </div>
+      <div class="field col-12 md:col-4">
+        <label> Taxable </label>
+        <p-selectButton
+          [options]="taxableOpt"
+          formControlName="taxable"
+          optionLabel="label"
+        ></p-selectButton>
+      </div>
+      <div class="field col-12 md:col-4">
+        <label htmlFor="amount"> Amount </label>
+        <p-inputNumber
+          id="amount"
+          formControlName="amount"
+          mode="currency"
+          currency="AED"
+          locale="en-US"
+          required
+        ></p-inputNumber>
+      </div>
+      <div class="flex justify-content-end align-items-center w-100">
+        <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="addInvoice()"
+        ></button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -41,7 +41,11 @@ export class LoginComponent {
       .sendPostRequest('auth/login', this.userForm.value, 8080, false, 'v1')
       .subscribe((res: any) => {
         localStorage.setItem('user', res.access_token);
-        this.route.navigate(['cheque']);
+        if (res.user.role === 'ADMIN_INVOICE') {
+          this.route.navigate(['invoice']);
+        } else {
+          this.route.navigate(['cheque']);
+        }
       });
   }
 }
