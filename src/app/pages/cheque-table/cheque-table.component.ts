@@ -127,11 +127,13 @@ export class ChequeTableComponent implements OnInit {
       console.log('====================================');
     });
     this.cols = [
-      { field: 'product', header: 'Product' },
-      { field: 'price', header: 'Price' },
-      { field: 'category', header: 'Category' },
-      { field: 'rating', header: 'Reviews' },
-      { field: 'inventoryStatus', header: 'Status' },
+      // { field: 'product', header: 'Cheque' },
+      { field: 'chequePayTo', header: 'chequePayTo' },
+      { field: 'dateOfPay', header: 'DateOfPay' },
+      { field: 'chequeAmount', header: 'ChequeAmount' },
+      // { field: 'Debit', header: 'Debit' },
+      // { field: 'Credit', header: 'Credit' },
+      { field: 'balance', header: 'Balance' },
     ];
 
     this.chequeStatusAdd = [
@@ -221,21 +223,28 @@ export class ChequeTableComponent implements OnInit {
       )
       .pipe(
         map((res: any) => {
-          this.currentBalance = this.balance;
-          res.checksSearchResponses.forEach((cheque: ChequeContent) => {
-            if (cheque.isPayed) {
-              this.currentBalance +=
-                cheque.chequeType === 'DEBIT'
-                  ? -cheque.chequeAmount
-                  : cheque.chequeAmount;
-            }
-          });
+          // this.currentBalance = this.balance;
+
+          res.checksSearchResponses = res.checksSearchResponses
+            .map((cheque: ChequeContent) => {
+              if (cheque.isPayed) {
+                this.currentBalance +=
+                  cheque.chequeType === 'DEBIT'
+                    ? -cheque.chequeAmount
+                    : cheque.chequeAmount;
+              }
+              if (cheque.chequeType === 'DEBIT') {
+                cheque.chequeAmount = -cheque.chequeAmount;
+              }
+              return cheque;
+            })
+            .filter((cheque: ChequeContent) => !cheque.isPayed);
           this.runningBalance = this.currentBalance;
           return res;
         })
       )
       .subscribe((res: any) => {
-        console.log(this.runningBalance);
+        // console.log(this.runningBalance);
 
         this.products = res.checksSearchResponses;
         this.allSuppliers = Array.from(

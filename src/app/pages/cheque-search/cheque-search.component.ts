@@ -106,11 +106,13 @@ export class ChequeSearchComponent implements OnInit {
     // this.getProducts().then((data) => (this.products = data));
     this.getAllCheque(10);
     this.cols = [
-      { field: 'product', header: 'Product' },
-      { field: 'price', header: 'Price' },
-      { field: 'category', header: 'Category' },
-      { field: 'rating', header: 'Reviews' },
-      { field: 'inventoryStatus', header: 'Status' },
+      // { field: 'product', header: 'Cheque' },
+      { field: 'chequePayTo', header: 'chequePayTo' },
+      { field: 'dateOfPay', header: 'DateOfPay' },
+      { field: 'chequeAmount', header: 'ChequeAmount' },
+      // { field: 'Debit', header: 'Debit' },
+      // { field: 'Credit', header: 'Credit' },
+      { field: 'balance', header: 'Balance' },
     ];
 
     this.chequeStatusAdd = [
@@ -205,6 +207,21 @@ export class ChequeSearchComponent implements OnInit {
         8080,
         false,
         'v1'
+      )
+      .pipe(
+        map((res: any) => {
+          // this.currentBalance = this.balance;
+
+          res.checksSearchResponses = res.checksSearchResponses.map(
+            (cheque: ChequeContent) => {
+              if (cheque.chequeType === 'DEBIT') {
+                cheque.chequeAmount = -cheque.chequeAmount;
+              }
+              return cheque;
+            }
+          );
+          return res;
+        })
       )
       .subscribe((res) => {
         this.products = res.checksSearchResponses;

@@ -200,14 +200,14 @@
                 (click)="deleteSelectedProducts()"
                 [disabled]="!selectedProducts || !selectedProducts.length"
               ></button> -->
-              <!-- <button
+              <button
                 pButton
                 pRipple
                 label="Export"
                 icon="pi pi-upload"
                 class="p-button-help"
                 (click)="dt.exportCSV()"
-              ></button> -->
+              ></button>
             </div>
           </div>
         </ng-template>
@@ -271,14 +271,14 @@
               <span class="p-column-title">Balance</span>
               <p
                 [ngClass]="{
-                  'color-Red': product.balance < 0
+                  'color-Red': product?.balance < 0
                 }"
               >
-                <span *ngIf="product.balance < 0">
-                  ( {{ product.balance | currency : "AED" }} )
+                <span *ngIf="product?.balance < 0">
+                  ( {{ product?.balance | currency : "AED" }} )
                 </span>
-                <span *ngIf="product.balance > 0">
-                  {{ product.balance | currency : "AED" }}
+                <span *ngIf="product?.balance > 0">
+                  {{ product?.balance | currency : "AED" }}
                 </span>
               </p>
             </td>
@@ -348,18 +348,18 @@
             <td
               style="text-align: left; width: 14%; min-width: 10rem"
               [ngClass]="{
-                'color-Red': products[products.length - 1].balance < 0
+                'color-Red': products[products.length - 1]?.balance < 0
               }"
             >
-              <span *ngIf="products[products.length - 1].balance < 0">
+              <span *ngIf="products[products.length - 1]?.balance < 0">
                 (
                 {{
-                  products[products.length - 1].balance * -1 | currency : "AED"
+                  products[products.length - 1]?.balance * -1 | currency : "AED"
                 }}
                 )
               </span>
-              <span *ngIf="products[products.length - 1].balance > 0">
-                {{ products[products.length - 1].balance | currency : "AED" }}
+              <span *ngIf="products[products.length - 1]?.balance > 0">
+                {{ products[products.length - 1]?.balance | currency : "AED" }}
               </span>
             </td>
             <td colspan="3"></td>
