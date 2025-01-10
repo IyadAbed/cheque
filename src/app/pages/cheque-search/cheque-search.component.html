@@ -40,7 +40,7 @@
               <button
                 pButton
                 pRipple
-                [label]="sum ? 'Sum : ' + sum : 'Sum'"
+                [label]="sum ? 'Sum : ' + (sum | currency : 'AED') : 'Sum'"
                 icon="pi pi-check"
                 (click)="calcSum()"
                 class="p-button-text"

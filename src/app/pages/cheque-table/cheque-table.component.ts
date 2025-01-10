@@ -22,6 +22,8 @@ export class ChequeTableComponent implements OnInit {
 
   balance: number = 0;
 
+  endingBalance: number = 0;
+
   currentBalance: number = 0;
 
   runningBalance: number = 0;
@@ -31,6 +33,10 @@ export class ChequeTableComponent implements OnInit {
   productDialog: boolean = false;
 
   chequeDialog: boolean = false;
+
+  searchDialog: boolean = false;
+
+  searchStatus: boolean = false;
 
   sortDirection: 'ASC' | 'DESC' = 'DESC';
 
@@ -223,7 +229,7 @@ export class ChequeTableComponent implements OnInit {
       )
       .pipe(
         map((res: any) => {
-          // this.currentBalance = this.balance;
+          this.currentBalance = this.balance;
 
           res.checksSearchResponses = res.checksSearchResponses
             .map((cheque: ChequeContent) => {
@@ -266,9 +272,14 @@ export class ChequeTableComponent implements OnInit {
           { creditSum: 0, debitSum: 0 } // Initial sums
         );
         console.log('depCre', depCre);
+        this.endingBalance = this.products[this.products.length - 1]?.balance;
         this.totalDebit = depCre.debitSum;
         this.totalCredit = depCre.creditSum;
       });
+  }
+
+  reload() {
+    window.location.reload();
   }
 
   updateOpeningBalance() {
@@ -299,16 +310,19 @@ export class ChequeTableComponent implements OnInit {
     console.log('Form Search', this.searchForm.value);
 
     if (reset) {
+      this.searchStatus = false;
       this.https
         .sendPostRequest<ChequeDetailsRes, any>(
           `checks/list/search`,
-          {},
+          { sortDirection: 'ASC' },
           8080,
           false,
           'v1'
         )
-        .subscribe((res) => {
+        .subscribe((res: any) => {
           this.products = res.checksSearchResponses;
+          this.searchForm.reset();
+          this.searchDialog = false;
           const depCre = res.checksSearchResponses.reduce(
             (acc, item) => {
               if (item.chequeType === 'CREDIT') {
@@ -323,7 +337,6 @@ export class ChequeTableComponent implements OnInit {
           console.log('depCre', depCre);
           this.totalDebit = depCre.debitSum;
           this.totalCredit = depCre.creditSum;
-          this.searchForm.reset();
         });
     } else {
       let body = this.searchForm.value;
@@ -337,8 +350,8 @@ export class ChequeTableComponent implements OnInit {
         startChequeAmount: this.searchForm.value.startChequeAmount
           ? this.searchForm.value.startChequeAmount
           : null,
-        endChequeAmount: this.searchForm.value.endChequeAmount
-          ? this.searchForm.value.endChequeAmount
+        endChequeAmount: this.searchForm.value.startChequeAmount
+          ? this.searchForm.value.startChequeAmount
           : null,
         isPayed: this.searchForm.value.isPayed?.value,
         startDateOfPay: this.searchForm.value.startDateOfPay
@@ -360,27 +373,31 @@ export class ChequeTableComponent implements OnInit {
       this.https
         .sendPostRequest<ChequeDetailsRes, any>(
           `checks/list/search`,
-          body,
+          { ...body, sortDirection: 'ASC' },
           8080,
           false,
           'v1'
         )
-        .subscribe((res) => {
-          this.products = res.checksSearchResponses;
-          const depCre = res.checksSearchResponses.reduce(
-            (acc, item) => {
-              if (item.chequeType === 'CREDIT') {
-                acc.creditSum += item.chequeAmount;
-              } else if (item.chequeType === 'DEBIT') {
-                acc.debitSum += item.chequeAmount;
-              }
-              return acc;
-            },
-            { creditSum: 0, debitSum: 0 } // Initial sums
-          );
-          console.log('depCre', depCre);
-          this.totalDebit = depCre.debitSum;
-          this.totalCredit = depCre.creditSum;
+        .subscribe({
+          next: (res) => {
+            this.products = res.checksSearchResponses;
+            this.searchDialog = false;
+            const depCre = res.checksSearchResponses.reduce(
+              (acc, item) => {
+                if (item.chequeType === 'CREDIT') {
+                  acc.creditSum += item.chequeAmount;
+                } else if (item.chequeType === 'DEBIT') {
+                  acc.debitSum += item.chequeAmount;
+                }
+                return acc;
+              },
+              { creditSum: 0, debitSum: 0 } // Initial sums
+            );
+            console.log('depCre', depCre);
+            this.searchStatus = true;
+            this.totalDebit = depCre.debitSum;
+            this.totalCredit = depCre.creditSum;
+          },
         });
     }
   }

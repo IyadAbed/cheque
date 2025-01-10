@@ -21,13 +21,11 @@
                   Ending Balance:
                   <span
                     [ngClass]="{
-                      'color-Red': products[products.length - 1]?.balance < 0
+                      'color-Red': endingBalance < 0
                     }"
                   >
                     (
-                    {{
-                      products[products.length - 1]?.balance | currency : "AED"
-                    }}
+                    {{ endingBalance | currency : "AED" }}
                     )
                   </span>
                 </h5>
@@ -166,6 +164,15 @@
                   class="w-full sm:w-auto"
                 />
               </span>
+              <button
+                pButton
+                pRipple
+                label="Refresh"
+                icon="pi pi-refresh"
+                (click)="reload()"
+              >
+                <!-- [routerLink]="'/cheque/search'" -->
+              </button>
               <!-- <p-dropdown
                 [options]="cities"
                 [(ngModel)]="selectedDrop"
@@ -174,14 +181,17 @@
               ></p-dropdown> -->
             </div>
             <div class="flex gap-2">
+              <button pButton label="Reset" (click)="getAllCheque()"></button>
               <button
                 pButton
                 pRipple
                 label="Search"
                 icon="pi pi-search"
                 class="p-button-warning"
-                [routerLink]="'/cheque/search'"
-              ></button>
+                (click)="searchDialog = true"
+              >
+                <!-- [routerLink]="'/cheque/search'" -->
+              </button>
               <button
                 pButton
                 pRipple
@@ -238,7 +248,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
-          <tr *ngIf="!product.isPayed">
+          <tr>
             <td>
               <p-tableCheckbox [value]="product"></p-tableCheckbox>
             </td>
@@ -747,38 +757,153 @@
       </ng-template>
     </p-dialog>
 
-    <!-- Delete Selected Product -->
-    <!-- Delete Selected Product -->
-    <!-- Delete Selected Product -->
+    <!-- Search on Cheque -->
+    <!-- Search on Cheque -->
+    <!-- Search on Cheque -->
 
-    <!-- <p-dialog
-      [(visible)]="deleteProductsDialog"
-      header="Confirm"
+    <p-dialog
+      [(visible)]="searchDialog"
+      [style]="{ width: '600px', height: '570px' }"
+      header="Search"
       [modal]="true"
-      [style]="{ width: '450px' }"
+      class="p-fluid"
+      [formGroup]="searchForm"
     >
-      <div class="flex align-items-center justify-content-center">
-        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-        <span>Are you sure you want to delete selected products?</span>
-      </div>
-      <ng-template pTemplate="footer">
-        <button
-          pButton
-          pRipple
-          icon="pi pi-times"
-          class="p-button-text"
-          label="No"
-          (click)="deleteProductsDialog = false"
-        ></button>
-        <button
-          pButton
-          pRipple
-          icon="pi pi-check"
-          class="p-button-text"
-          label="Yes"
-          (click)="confirmDeleteSelected()"
-        ></button>
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <div class="field">
+          <label for="name">Pay against</label>
+          <p-autoComplete
+            formControlName="chequePayTo"
+            [suggestions]="filteredSuppliers"
+            (completeMethod)="filterCountry($event)"
+            (keydown)="onKeydown($event, searchForm)"
+          ></p-autoComplete>
+        </div>
+
+        <div class="field">
+          <label htmlFor="chequeNumber">Cheque Number</label>
+          <input pInputText formControlName="chequeNumber" type="text" />
+        </div>
+
+        <!-- <div class="field">
+        <label for="status">Cheque Status</label>
+        <p-dropdown
+          [(ngModel)]="product.inventoryStatus"
+          inputId="inventoryStatus"
+          optionValue="label"
+          [options]="statuses"
+          placeholder="Select"
+        >
+          <ng-template pTemplate="selectedItem">
+            <span
+              *ngIf="product && product.inventoryStatus"
+              [class]="
+                'product-badge status-' +
+                product.inventoryStatus.toString().toLowerCase()
+              "
+              >{{ product.inventoryStatus }}</span
+            >
+          </ng-template>
+          <ng-template let-option pTemplate="item">
+            <span [class]="'product-badge status-' + option.value">{{
+              option.label
+            }}</span>
+          </ng-template>
+        </p-dropdown>
+      </div> -->
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">Cheque Amount</label>
+            <p-inputNumber
+              id="price"
+              formControlName="startChequeAmount"
+              mode="currency"
+              currency="AED"
+              locale="en-US"
+              required
+            ></p-inputNumber>
+          </div>
+        </div>
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label htmlFor="state">Cheque Type</label>
+            <p-selectButton
+              formControlName="chequeType"
+              [options]="chequeTypeAdd"
+              optionLabel="label"
+            ></p-selectButton>
+            <!-- <p-dropdown
+            formControlName="chequeType"
+            [options]="chequeTypeAdd"
+            optionLabel="label"
+          ></p-dropdown> -->
+          </div>
+        </div>
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label htmlFor="state">Cheque Status</label>
+            <p-selectButton
+              [options]="chequeStatusAdd"
+              formControlName="isPayed"
+              optionLabel="label"
+            ></p-selectButton>
+            <!-- <p-dropdown
+            formControlName="isPayed"
+            [options]="chequeStatusAdd"
+            optionLabel="label"
+          ></p-dropdown> -->
+          </div>
+        </div>
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">Start Data</label>
+            <p-calendar
+              required
+              formControlName="startDateOfPay"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
+          </div>
+        </div>
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">End Data</label>
+            <p-calendar
+              required
+              formControlName="endDateOfPay"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
+          </div>
+        </div>
       </ng-template>
-    </p-dialog> -->
+
+      <ng-template pTemplate="footer">
+        <div class="flex justify-content-end align-items-center mt-1">
+          <div>
+            <button
+              pButton
+              pRipple
+              label="Cancel"
+              icon="pi pi-times"
+              class="p-button-text"
+              (click)="this.searchDialog = false"
+            ></button>
+            <button
+              pButton
+              pRipple
+              label="Search"
+              icon="pi pi-check"
+              class="p-button-text"
+              (click)="AdvanceSearch()"
+            ></button>
+          </div>
+        </div>
+      </ng-template>
+    </p-dialog>
   </div>
 </div>
