@@ -22,6 +22,8 @@ export class ChequeTableComponent implements OnInit {
 
   balance: number = 0;
 
+  sum: number;
+
   endingBalance: number = 0;
 
   currentBalance: number = 0;
@@ -692,42 +694,23 @@ export class ChequeTableComponent implements OnInit {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  // exportSelectedCSV() {
-  //   if (!this.selectedProducts || this.selectedProducts.length === 0) {
-  //     return;
-  //   }
+  calcSum() {
+    console.log(this.selectedProducts);
 
-  //   const csvRows = [];
-  //   const headers = [
-  //     'Cheque Pay To',
-  //     'Date Of Pay',
-  //     'Debit',
-  //     'Credit',
-  //     'Balance',
-  //   ];
-  //   csvRows.push(headers.join(',')); // Add CSV headers
+    if (this.selectedProducts.length > 0) {
+      let sums = 0;
+      this.selectedProducts.forEach((cheque) => {
+        sums +=
+          cheque.chequeType === 'DEBIT'
+            ? -cheque.chequeAmount
+            : cheque.chequeAmount;
+      });
+      this.sum = sums;
+    } else {
+      this.sum = undefined;
+    }
+  }
 
-  //   this.selectedProducts.forEach((product) => {
-  //     const row = [
-  //       `"${product.chequePayTo}"`,
-  //       `"${product.dateOfPay}"`,
-  //       product.chequeType === 'DEBIT' ? `(${product.chequeAmount})` : '-',
-  //       product.chequeType === 'CREDIT' ? product.chequeAmount : '-',
-  //       product.balance < 0 ? `(${product.balance})` : product.balance,
-  //     ];
-  //     csvRows.push(row.join(','));
-  //   });
-
-  //   const csvData = csvRows.join('\n');
-  //   const blob = new Blob([csvData], { type: 'text/csv' });
-  //   const url = window.URL.createObjectURL(blob);
-  //   const a = document.createElement('a');
-  //   a.href = url;
-  //   a.download = 'selected_cheques.csv';
-  //   document.body.appendChild(a);
-  //   a.click();
-  //   document.body.removeChild(a);
-  // }
   exportSelectedCSV() {
     if (!this.selectedProducts || this.selectedProducts.length === 0) {
       return;

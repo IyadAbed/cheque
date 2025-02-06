@@ -173,6 +173,18 @@
               >
                 <!-- [routerLink]="'/cheque/search'" -->
               </button>
+              <span
+                class="flex gap-2 justify-content-center align-items-center"
+              >
+                <button
+                  pButton
+                  pRipple
+                  [label]="sum ? 'Sum : ' + (sum | currency : 'AED') : 'Sum'"
+                  icon="pi pi-check"
+                  (click)="calcSum()"
+                  class="p-button-text"
+                ></button>
+              </span>
               <!-- <p-dropdown
                 [options]="cities"
                 [(ngModel)]="selectedDrop"
