@@ -137,8 +137,8 @@ export class ChequeTableComponent implements OnInit {
       { field: 'chequePayTo', header: 'chequePayTo' },
       { field: 'dateOfPay', header: 'DateOfPay' },
       { field: 'chequeAmount', header: 'ChequeAmount' },
-      // { field: 'Debit', header: 'Debit' },
-      // { field: 'Credit', header: 'Credit' },
+      { field: 'Debit', header: 'Debit' },
+      { field: 'Credit', header: 'Credit' },
       { field: 'balance', header: 'Balance' },
     ];
 
@@ -217,6 +217,22 @@ export class ChequeTableComponent implements OnInit {
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // Adjust to UTC without changing the time
     return d.toISOString().split('T')[0]; // Keep only the date part
   }
+  normalizeDateNew(date: any): string {
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset()); // Adjust to UTC
+
+    if (!date) return today.toISOString().split('T')[0]; // Return today's date if no date is provided
+
+    const inputDate = new Date(date);
+    inputDate.setMinutes(
+      inputDate.getMinutes() - inputDate.getTimezoneOffset()
+    ); // Adjust to UTC
+
+    // If inputDate is in the past, return today's date
+    return inputDate < today
+      ? today.toISOString().split('T')[0]
+      : inputDate.toISOString().split('T')[0];
+  }
 
   getAllCheque(pageSize: any, sort: any) {
     this.https
@@ -230,6 +246,13 @@ export class ChequeTableComponent implements OnInit {
       .pipe(
         map((res: any) => {
           this.currentBalance = this.balance;
+          this.allSuppliers = Array.from(
+            new Set(
+              res.checksSearchResponses.map(
+                (chequeData: ChequeContent) => chequeData.chequePayTo
+              )
+            )
+          );
 
           res.checksSearchResponses = res.checksSearchResponses
             .map((cheque: ChequeContent) => {
@@ -241,6 +264,9 @@ export class ChequeTableComponent implements OnInit {
               }
               if (cheque.chequeType === 'DEBIT') {
                 cheque.chequeAmount = -cheque.chequeAmount;
+                cheque.Debit = -cheque.chequeAmount;
+              } else {
+                cheque.Credit = cheque.chequeAmount;
               }
               return cheque;
             })
@@ -253,13 +279,6 @@ export class ChequeTableComponent implements OnInit {
         // console.log(this.runningBalance);
 
         this.products = res.checksSearchResponses;
-        this.allSuppliers = Array.from(
-          new Set(
-            res.checksSearchResponses.map(
-              (chequeData: ChequeContent) => chequeData.chequePayTo
-            )
-          )
-        );
         const depCre = res.checksSearchResponses.reduce(
           (acc, item) => {
             if (item.chequeType === 'CREDIT' && !item.isPayed) {
@@ -537,10 +556,6 @@ export class ChequeTableComponent implements OnInit {
     this.deleteProductsDialog = true;
   }
 
-  // addCategory() {
-  //   this.categoryDialog = true;
-  // }
-
   editProduct(product: any) {
     this.product = { ...product };
     console.log('====================================');
@@ -622,7 +637,7 @@ export class ChequeTableComponent implements OnInit {
       let body = this.chequeForm.value;
       body = {
         ...body,
-        dateOfPay: this.normalizeDate(this.chequeForm.value.dateOfPay),
+        dateOfPay: this.normalizeDateNew(this.chequeForm.value.dateOfPay),
         chequeType: this.chequeForm.value.chequeType?.value,
         isPayed: this.chequeForm.value.isPayed?.value,
       };
@@ -676,6 +691,102 @@ export class ChequeTableComponent implements OnInit {
   onGlobalFilter(table: Table, event: Event) {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
+
+  // exportSelectedCSV() {
+  //   if (!this.selectedProducts || this.selectedProducts.length === 0) {
+  //     return;
+  //   }
+
+  //   const csvRows = [];
+  //   const headers = [
+  //     'Cheque Pay To',
+  //     'Date Of Pay',
+  //     'Debit',
+  //     'Credit',
+  //     'Balance',
+  //   ];
+  //   csvRows.push(headers.join(',')); // Add CSV headers
+
+  //   this.selectedProducts.forEach((product) => {
+  //     const row = [
+  //       `"${product.chequePayTo}"`,
+  //       `"${product.dateOfPay}"`,
+  //       product.chequeType === 'DEBIT' ? `(${product.chequeAmount})` : '-',
+  //       product.chequeType === 'CREDIT' ? product.chequeAmount : '-',
+  //       product.balance < 0 ? `(${product.balance})` : product.balance,
+  //     ];
+  //     csvRows.push(row.join(','));
+  //   });
+
+  //   const csvData = csvRows.join('\n');
+  //   const blob = new Blob([csvData], { type: 'text/csv' });
+  //   const url = window.URL.createObjectURL(blob);
+  //   const a = document.createElement('a');
+  //   a.href = url;
+  //   a.download = 'selected_cheques.csv';
+  //   document.body.appendChild(a);
+  //   a.click();
+  //   document.body.removeChild(a);
+  // }
+  exportSelectedCSV() {
+    if (!this.selectedProducts || this.selectedProducts.length === 0) {
+      return;
+    }
+
+    const csvRows = [];
+    const headers = [
+      'Cheque Pay To',
+      'Date Of Pay',
+      'Debit',
+      'Credit',
+      'Balance',
+      // 'Cheque Number',
+    ];
+    csvRows.push(headers.join(',')); // Add CSV headers
+
+    let totalDebit = 0;
+    let totalCredit = 0;
+    let endingBalance = 0;
+
+    this.selectedProducts.forEach((product) => {
+      const debitAmount =
+        product.chequeType === 'DEBIT' ? product.chequeAmount : 0;
+      const creditAmount =
+        product.chequeType === 'CREDIT' ? product.chequeAmount : 0;
+
+      totalDebit += debitAmount;
+      totalCredit += creditAmount;
+      endingBalance = product.balance; // Assuming last item's balance is the final balance
+
+      const row = [
+        `"${product.chequePayTo}"`,
+        `"${product.dateOfPay}"`,
+        debitAmount ? `(${debitAmount})` : '-',
+        creditAmount ? creditAmount : '-',
+        product.balance < 0 ? `(${product.balance})` : product.balance,
+        // product.chequeNumber || '-',
+      ];
+      csvRows.push(row.join(','));
+    });
+
+    // Add totals row
+    csvRows.push(''); // Empty line before total
+    csvRows.push(
+      `Total,,(${totalDebit}),${totalCredit},${
+        endingBalance < 0 ? `(${endingBalance})` : endingBalance
+      },`
+    );
+
+    const csvData = csvRows.join('\n');
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'selected_cheques.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
 }
 
 interface ChequeDetailsRes {
@@ -718,6 +829,8 @@ interface ChequeContent {
   updatedAt: string; // Same as above
   deletedAt: string | null; // Nullable for potential absence
   balance: number;
+  Credit?: number;
+  Debit?: number;
 }
 
 interface PaginatedChequeResponse {

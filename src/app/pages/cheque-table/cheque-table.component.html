@@ -213,11 +213,20 @@
               <button
                 pButton
                 pRipple
+                label="Export Selected"
+                icon="pi pi-upload"
+                class="p-button-help"
+                (click)="exportSelectedCSV()"
+                [disabled]="!selectedProducts || selectedProducts.length === 0"
+              ></button>
+              <!-- <button
+                pButton
+                pRipple
                 label="Export"
                 icon="pi pi-upload"
                 class="p-button-help"
                 (click)="dt.exportCSV()"
-              ></button>
+              ></button> -->
             </div>
           </div>
         </ng-template>
