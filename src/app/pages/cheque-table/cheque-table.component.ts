@@ -240,7 +240,10 @@ export class ChequeTableComponent implements OnInit {
     this.https
       .sendPostRequest(
         `checks/list/search`,
-        { sortDirection: 'ASC' },
+        {
+          sortDirection: 'ASC',
+          // startDateOfPay: this.dateNow.toISOString().split('T')[0],
+        },
         8080,
         false,
         'v1'
@@ -542,9 +545,6 @@ export class ChequeTableComponent implements OnInit {
   }
 
   onFilter(dv: DataView, event: Event) {
-    console.log('====================================');
-    console.log('sadasfsdfsdf');
-    console.log('====================================');
     dv.filter((event.target as HTMLInputElement).value);
   }
 
@@ -560,9 +560,6 @@ export class ChequeTableComponent implements OnInit {
 
   editProduct(product: any) {
     this.product = { ...product };
-    console.log('====================================');
-    console.log(product);
-    console.log('====================================');
     const dateOfPay = new Date(product.dateOfPay);
     this.chequeForm.patchValue({
       chequeAmount: this.product.chequeAmount,
@@ -639,7 +636,9 @@ export class ChequeTableComponent implements OnInit {
       let body = this.chequeForm.value;
       body = {
         ...body,
-        dateOfPay: this.normalizeDateNew(this.chequeForm.value.dateOfPay),
+        dateOfPay: this.chequeForm.value.isPayed?.value
+          ? this.normalizeDate(this.chequeForm.value.dateOfPay)
+          : this.normalizeDateNew(this.chequeForm.value.dateOfPay),
         chequeType: this.chequeForm.value.chequeType?.value,
         isPayed: this.chequeForm.value.isPayed?.value,
       };
