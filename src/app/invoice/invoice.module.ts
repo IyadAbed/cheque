@@ -32,6 +32,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { AddInvoiceComponent } from './add-invoice/add-invoice.component';
 import { PayBillComponent } from './pay-bill/pay-bill.component';
+import { TabViewModule } from 'primeng/tabview';
 
 @NgModule({
   declarations: [HomeComponent, AddInvoiceComponent, PayBillComponent],
@@ -51,6 +52,7 @@ import { PayBillComponent } from './pay-bill/pay-bill.component';
     InputTextareaModule,
     InputTextModule,
     DataViewModule,
+    TabViewModule,
     AccordionModule,
     // PickListModule,
     // OrderListModule,

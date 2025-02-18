@@ -1,6 +1,6 @@
 <div class="grid">
   <div class="col-12 lg:col-6 xl:col-3">
-    <div class="card mb-0" [routerLink]="'Add'">
+    <div class="card mb-0" (click)="invoiceDialog = true">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Add Invoice</span> -->
@@ -89,138 +89,650 @@
       <span class="text-500">responded</span> -->
     </div>
   </div>
-  <div class="w-full">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <!-- [(selection)]="selectedProducts" -->
+      <p-table
+        #dt
+        [value]="products"
+        [columns]="cols"
+        responsiveLayout="scroll"
+        [rows]="10"
+        [globalFilterFields]="['chequePayTo']"
+        (rowsChange)="getAllInvoices(10, 'DESC')"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        selectionMode="multiple"
+        [rowHover]="true"
+        dataKey="id"
+      >
+        <ng-template pTemplate="caption">
+          <div
+            class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+          >
+            <div class="flex gap-2">
+              <span class="block mt-2 md:mt-0 p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input
+                  pInputText
+                  type="text"
+                  (input)="onGlobalFilter(dt, $event)"
+                  placeholder="Search..."
+                  class="w-full sm:w-auto"
+                />
+              </span>
+              <button
+                pButton
+                pRipple
+                label="Refresh"
+                icon="pi pi-refresh"
+                (click)="reload()"
+              >
+                <!-- [routerLink]="'/cheque/search'" -->
+              </button>
+              <span
+                class="flex gap-2 justify-content-center align-items-center"
+              >
+                <button
+                  pButton
+                  pRipple
+                  [label]="sum ? 'Sum : ' + (sum | currency : 'AED') : 'Sum'"
+                  icon="pi pi-check"
+                  (click)="calcSum()"
+                  class="p-button-text"
+                ></button>
+              </span>
+              <!-- <p-dropdown
+                [options]="cities"
+                [(ngModel)]="selectedDrop"
+                placeholder="Select a Section"
+                [showClear]="true"
+              ></p-dropdown> -->
+            </div>
+            <div class="flex gap-2">
+              <button pButton label="Reset" (click)="getAllCheque()"></button>
+              <button
+                pButton
+                pRipple
+                label="Search"
+                icon="pi pi-search"
+                class="p-button-warning"
+                (click)="searchDialog = true"
+              >
+                <!-- [routerLink]="'/cheque/search'" -->
+              </button>
+              <button
+                pButton
+                pRipple
+                label="New"
+                icon="pi pi-plus"
+                class="p-button-success"
+                (click)="openNew()"
+              ></button>
+
+              <!-- <button
+                pButton
+                pRipple
+                label="Delete"
+                icon="pi pi-trash"
+                class="p-button-danger"
+                (click)="deleteSelectedProducts()"
+                [disabled]="!selectedProducts || !selectedProducts.length"
+              ></button> -->
+              <button
+                pButton
+                pRipple
+                label="Export Selected"
+                icon="pi pi-upload"
+                class="p-button-help"
+                (click)="exportSelectedCSV()"
+                [disabled]="!selectedProducts || selectedProducts.length === 0"
+              ></button>
+              <!-- <button
+                pButton
+                pRipple
+                label="Export"
+                icon="pi pi-upload"
+                class="p-button-help"
+                (click)="dt.exportCSV()"
+              ></button> -->
+            </div>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th pSortableColumn="invoiceDate">
+              Invoice Date <p-sortIcon field="invoiceDate"></p-sortIcon>
+            </th>
+            <th pSortableColumn="projectName">
+              Project <p-sortIcon field="projectName"></p-sortIcon>
+            </th>
+            <th
+              pSortableColumn="supplierName"
+              (click)="getAllCheque(10, !sortDirection)"
+            >
+              Supplier <p-sortIcon></p-sortIcon>
+            </th>
+            <th pSortableColumn="number">Invoice Number</th>
+            <!-- <th>Image</th> -->
+            <th pSortableColumn="amount">Amount</th>
+            <th pSortableColumn="paidAmount">Paid Amount</th>
+            <th pSortableColumn="itemDetails">Item Details</th>
+            <th pSortableColumn="payDetails">Pay Details</th>
+            <!-- <th pSortableColumn="rating">
+              Reviews <p-sortIcon field="rating"></p-sortIcon>
+            </th> -->
+            <!-- <th pSortableColumn="isPayed">Is Payed</th> -->
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="product"></p-tableCheckbox>
+            </td>
+            <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">invoiceDate</span>
+              {{ product.invoiceDate | date : "dd/MM/yyyy" }}
+            </td>
+            <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">Project</span>
+              {{ product.projectName }}
+            </td>
+            <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">Supplier</span>
+              {{ product.supplierName }}
+            </td>
+            <td style="width: 14%; min-width: 8rem color-Red">
+              <span class="p-column-title">Invoice Number</span>
+              <p>
+                <span> {{ product.number }} </span>
+              </p>
+            </td>
+            <td style="width: 14%; min-width: 8rem">
+              <span class="p-column-title">amount</span>
+              <p>
+                <span> {{ product?.amount | currency : "AED" }} </span>
+              </p>
+            </td>
+            <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">paidAmount</span>
+              {{ product.paidAmount || "-" }}
+            </td>
+            <td
+              style="width: 14%; min-width: 10rem"
+              (click)="openDetails(product)"
+            >
+              <span class="p-column-title">itemDetails</span>
+              Item Details
+            </td>
+            <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">payDetails</span>
+              {{ product.paidAmount ? "Pay Details" : "-" }}
+            </td>
+            <!-- <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">Is Payed</span>
+              <span
+                [class]="
+                  'product-badge status-' +
+                  (product.inventoryStatus
+                    ? product.inventoryStatus.toLowerCase()
+                    : '')
+                "
+                >{{ product.isPayed }}</span
+              >
+            </td> -->
+            <td>
+              <div class="flex">
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-check"
+                  class="p-button-rounded p-button-success mr-2"
+                  (click)="chequeUpdateStatus(product)"
+                ></button>
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-success mr-2"
+                  (click)="editProduct(product)"
+                ></button>
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-warning"
+                  (click)="deleteCheque(product)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <!-- <ng-template pTemplate="footer">
+          <tr>
+            <td
+              colspan="3"
+              style="
+                width: 28%;
+                min-width: 10rem;
+                text-align: left;
+                font-weight: bold;
+              "
+            >
+              Total:
+            </td>
+            <td style="text-align: left; width: 14%; min-width: 10rem">
+              ( {{ totalDebit | currency : "AED" }} )
+            </td>
+            <td style="text-align: left; width: 14%; min-width: 10rem">
+              {{ totalCredit | currency : "AED" }}
+            </td>
+            <td
+              style="text-align: left; width: 14%; min-width: 10rem"
+              [ngClass]="{
+                'color-Red': products[products.length - 1]?.balance < 0
+              }"
+            >
+              <span *ngIf="products[products.length - 1]?.balance < 0">
+                (
+                {{
+                  products[products.length - 1]?.balance * -1 | currency : "AED"
+                }}
+                )
+              </span>
+              <span *ngIf="products[products.length - 1]?.balance > 0">
+                {{ products[products.length - 1]?.balance | currency : "AED" }}
+              </span>
+            </td>
+            <td colspan="3"></td>
+          </tr>
+        </ng-template> -->
+      </p-table>
+    </div>
+    <!-- <div class="w-full">
     <router-outlet></router-outlet>
-  </div>
+  </div> -->
 
-  <!-- Add New Supplier -->
-  <!-- Add New Supplier -->
-  <!-- Add New Supplier -->
-  <p-dialog
-    [(visible)]="supplierDialog"
-    [style]="{ width: '600px', height: '320px' }"
-    header="Add New Supplier"
-    [modal]="true"
-    class="p-fluid"
-    [formGroup]="supplierForm"
-  >
-    <ng-template
-      pTemplate="content"
-      class="flex flex-column justify-content-md-end"
+    <!-- Add New Supplier -->
+    <!-- Add New Supplier -->
+    <!-- Add New Supplier -->
+    <p-dialog
+      [(visible)]="supplierDialog"
+      [style]="{ width: '600px', height: '320px' }"
+      header="Add New Supplier"
+      [modal]="true"
+      class="p-fluid"
+      [formGroup]="supplierForm"
     >
-      <div class="field">
-        <label htmlFor="name">Supplier Name</label>
-        <input pInputText formControlName="name" type="text" />
-      </div>
-      <div class="field">
-        <label htmlFor="name">TRN Number</label>
-        <input pInputText formControlName="trnNumber" type="text" />
-      </div>
-    </ng-template>
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <div class="field">
+          <label htmlFor="name">Supplier Name</label>
+          <input pInputText formControlName="name" type="text" />
+        </div>
+        <div class="field">
+          <label htmlFor="name">TRN Number</label>
+          <input pInputText formControlName="trnNumber" type="text" />
+        </div>
+      </ng-template>
 
-    <ng-template pTemplate="footer">
-      <button
-        pButton
-        pRipple
-        label="Cancel"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="this.supplierDialog = false"
-      ></button>
-      <button
-        pButton
-        pRipple
-        label="Save"
-        icon="pi pi-check"
-        class="p-button-text"
-        (click)="addNewSupplier()"
-      ></button>
-    </ng-template>
-  </p-dialog>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="this.supplierDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="addNewSupplier()"
+        ></button>
+      </ng-template>
+    </p-dialog>
 
-  <!-- Add New Project -->
-  <!-- Add New Project -->
-  <!-- Add New Project -->
-  <p-dialog
-    [(visible)]="projectDialog"
-    [style]="{ width: '600px', height: '240px' }"
-    header="Add New Project"
-    [modal]="true"
-    class="p-fluid"
-    [formGroup]="projectForm"
-  >
-    <ng-template
-      pTemplate="content"
-      class="flex flex-column justify-content-md-end"
+    <!-- Add New Project -->
+    <!-- Add New Project -->
+    <!-- Add New Project -->
+    <p-dialog
+      [(visible)]="projectDialog"
+      [style]="{ width: '600px', height: '240px' }"
+      header="Add New Project"
+      [modal]="true"
+      class="p-fluid"
+      [formGroup]="projectForm"
     >
-      <div class="field">
-        <label htmlFor="name">Project Name</label>
-        <input pInputText formControlName="name" type="text" />
-      </div>
-    </ng-template>
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <div class="field">
+          <label htmlFor="name">Project Name</label>
+          <input pInputText formControlName="name" type="text" />
+        </div>
+      </ng-template>
 
-    <ng-template pTemplate="footer">
-      <button
-        pButton
-        pRipple
-        label="Cancel"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="this.projectDialog = false"
-      ></button>
-      <button
-        pButton
-        pRipple
-        label="Save"
-        icon="pi pi-check"
-        class="p-button-text"
-        (click)="addNewProject()"
-      ></button>
-    </ng-template>
-  </p-dialog>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="this.projectDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="addNewProject()"
+        ></button>
+      </ng-template>
+    </p-dialog>
 
-  <!-- Add New Item -->
-  <!-- Add New Item -->
-  <!-- Add New Item -->
-  <p-dialog
-    [(visible)]="itemDialog"
-    [style]="{ width: '600px', height: '330px' }"
-    header="Add New Item"
-    [modal]="true"
-    class="p-fluid"
-    [formGroup]="itemForm"
-  >
-    <ng-template
-      pTemplate="content"
-      class="flex flex-column justify-content-md-end"
+    <!-- Add New Item -->
+    <!-- Add New Item -->
+    <!-- Add New Item -->
+    <p-dialog
+      [(visible)]="itemDialog"
+      [style]="{ width: '600px', height: '330px' }"
+      header="Add New Item"
+      [modal]="true"
+      class="p-fluid"
+      [formGroup]="itemForm"
     >
-      <div class="field">
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <div class="field">
+          <label htmlFor="name">Item Name</label>
+          <input pInputText formControlName="name" type="text" />
+        </div>
+        <div class="field">
+          <label htmlFor="description">Item Description</label>
+          <input pInputText formControlName="description" type="text" />
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="this.itemDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="addNewItem()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Add New Invoice -->
+    <!-- Add New Invoice -->
+    <!-- Add New Invoice -->
+    <p-dialog
+      [(visible)]="invoiceDialog"
+      [style]="{ width: '800px', height: '90%' }"
+      header="Add New Invoice"
+      [modal]="true"
+      class="p-fluid"
+      [formGroup]="invoiceForm"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+        [formGroup]="invoiceForm"
+      >
+        <div class="field col-12">
+          <label for="supplierId">Supplier</label>
+          <p-autoComplete
+            formControlName="supplierId"
+            [suggestions]="filteredSuppliers"
+            (completeMethod)="filterCountry($event, 'supplier')"
+            (keydown)="onKeydown($event, invoiceForm, 'supplier')"
+          ></p-autoComplete>
+        </div>
+        <div class="field col-12">
+          <label for="supplierId">Project</label>
+          <p-autoComplete
+            formControlName="projectId"
+            [suggestions]="filteredProjects"
+            (completeMethod)="filterCountry($event, 'project')"
+            (keydown)="onKeydown($event, invoiceForm, 'project')"
+          ></p-autoComplete>
+        </div>
+        <div class="field col-12">
+          <label htmlFor="number">Invoice Number</label>
+          <input pInputText formControlName="number" type="text" />
+        </div>
+        <div class="field col-12">
+          <label>Invoice Date</label>
+          <p-calendar
+            required
+            formControlName="invoiceDate"
+            dateFormat="dd/mm/yy"
+          ></p-calendar>
+        </div>
+        <div formArrayName="items" class="field col-12 md:col-12">
+          <div
+            class="p-fluid p-formgrid grid"
+            *ngFor="let control of items.controls; let i = index"
+            [formGroupName]="i"
+          >
+            <div class="field col-12 md:col-4">
+              <label for="supplierId">Item</label>
+              <p-autoComplete
+                formControlName="itemId"
+                [suggestions]="filteredItem"
+                (completeMethod)="filterCountry($event, 'item')"
+                (keydown)="onKeydown($event, control, 'item')"
+              ></p-autoComplete>
+            </div>
+
+            <div class="field col-12 md:col-4">
+              <label htmlFor="itemDescription">Item Description</label>
+              <input pInputText formControlName="itemDescription" type="text" />
+            </div>
+            <div class="field col-12 md:col-4">
+              <label htmlFor="quantity">Item quantity</label>
+              <p-inputNumber
+                id="amount"
+                formControlName="quantity"
+                locale="en-US"
+                required
+              ></p-inputNumber>
+            </div>
+            <div class="field col-12 md:col-4">
+              <label htmlFor="price">Item price</label>
+              <p-inputNumber
+                id="amount"
+                formControlName="price"
+                mode="currency"
+                currency="AED"
+                locale="en-US"
+                required
+              ></p-inputNumber>
+            </div>
+            <div class="field col-12 md:col-4">
+              <label htmlFor="total">Total</label>
+              <p-inputNumber
+                id="amount"
+                formControlName="total"
+                mode="currency"
+                currency="AED"
+                locale="en-US"
+                required
+              ></p-inputNumber>
+            </div>
+            <div class="field col-12 md:col-4 align-items-center">
+              <button
+                pButton
+                pRipple
+                icon="pi pi-times"
+                class="p-button-text"
+                (click)="removeItem(i)"
+              ></button>
+            </div>
+          </div>
+        </div>
+        <div class="field col-12 md:col-12">
+          <button
+            pButton
+            pRipple
+            label="Add Item To Invoice"
+            icon="pi pi-plus"
+            class="p-button-text"
+            (click)="generateNewItem()"
+          ></button>
+        </div>
+
+        <div class="field col-12">
+          <label> Taxable </label>
+          <p-selectButton
+            [options]="taxableOpt"
+            formControlName="taxable"
+            optionLabel="label"
+          ></p-selectButton>
+        </div>
+        <div class="field col-12">
+          <label htmlFor="amount"> Amount </label>
+          <p-inputNumber
+            id="amount"
+            formControlName="amount"
+            mode="currency"
+            currency="AED"
+            locale="en-US"
+            required
+          ></p-inputNumber>
+        </div>
+
+        <!-- <div class="field">
         <label htmlFor="name">Item Name</label>
         <input pInputText formControlName="name" type="text" />
       </div>
       <div class="field">
         <label htmlFor="description">Item Description</label>
         <input pInputText formControlName="description" type="text" />
-      </div>
-    </ng-template>
+      </div> -->
+      </ng-template>
 
-    <ng-template pTemplate="footer">
-      <button
-        pButton
-        pRipple
-        label="Cancel"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="this.itemDialog = false"
-      ></button>
-      <button
-        pButton
-        pRipple
-        label="Save"
-        icon="pi pi-check"
-        class="p-button-text"
-        (click)="addNewItem()"
-      ></button>
-    </ng-template>
-  </p-dialog>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="invoiceForm = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="addInvoice()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Show Item -->
+    <!-- Show Item -->
+    <!-- Show Item -->
+    <p-dialog
+      [(visible)]="itemDetailsDialog"
+      [style]="{ width: '50%', height: '70%' }"
+      header="Show Details"
+      [modal]="true"
+      class="p-fluid"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <p-tabView>
+          <p-tabPanel header="Table 1">
+            <p-table
+              [value]="invoiceItem"
+              [tableStyle]="{ 'min-width': '100%' }"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Name</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Total Price</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-product>
+                <tr>
+                  <td>{{ product?.item.name }}</td>
+                  <td>{{ product?.quantity }}</td>
+                  <td>{{ product?.price }}</td>
+                  <td>{{ product?.total }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-tabPanel>
+
+          <p-tabPanel header="Table 2">
+            <p-table [value]="products" [tableStyle]="{ 'min-width': '100%' }">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Date</th>
+                  <th>Paid Value</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-product>
+                <tr>
+                  <td>{{ product?.code }}</td>
+                  <td>{{ product?.name }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-tabPanel>
+        </p-tabView>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="itemDetailsDialog = false"
+        ></button>
+        <!-- <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="addInvoice()"
+        ></button> -->
+      </ng-template>
+    </p-dialog>
+  </div>
 </div>

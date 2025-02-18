@@ -18,17 +18,11 @@ export class AddInvoiceComponent {
   filteredSuppliers: Supplier[];
   filteredProjects: Project[];
   filteredItem: Item[];
-  selectedState: any = null;
-  invoiceForm!: FormGroup;
-  dropdownItems = [
-    { name: 'Option 1', code: 'Option 1' },
-    { name: 'Option 2', code: 'Option 2' },
-    { name: 'Option 3', code: 'Option 3' },
-  ];
   taxableOpt = [
     { label: 'Taxable', value: true },
     { label: 'Non Taxable', value: false },
   ];
+  invoiceForm!: FormGroup;
 
   private itemsSubscription: Subscription;
   private ProjectsSubscription: Subscription;
@@ -77,6 +71,7 @@ export class AddInvoiceComponent {
     });
     this.items.push(FormArr);
   }
+
   removeItem(index: number) {
     this.items.removeAt(index);
   }
@@ -152,12 +147,6 @@ export class AddInvoiceComponent {
   }
 
   addInvoice() {
-    console.log('====================================');
-    console.log('valid', this.invoiceForm.valid);
-    console.log('====================================');
-    console.log('====================================');
-    console.log('value', this.invoiceForm.value);
-    console.log('====================================');
     if (this.invoiceForm.valid) {
       const itemsData = this.items.controls.map((control, index) => ({
         itemId: this.allItems.find(
