@@ -17,7 +17,7 @@
       <span class="text-500">since last visit</span> -->
     </div>
   </div>
-  <div class="col-12 lg:col-6 xl:col-2">
+  <div class="col-12 lg:col-6 xl:col-3">
     <div class="card mb-0" (click)="this.supplierDialog = true">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
@@ -35,7 +35,7 @@
       <span class="text-500">since last visit</span> -->
     </div>
   </div>
-  <div class="col-12 lg:col-6 xl:col-2">
+  <div class="col-12 lg:col-6 xl:col-3">
     <div class="card mb-0" (click)="this.projectDialog = true">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
@@ -53,7 +53,7 @@
       <span class="text-500">since last week</span> -->
     </div>
   </div>
-  <div class="col-12 lg:col-6 xl:col-2">
+  <div class="col-12 lg:col-6 xl:col-3">
     <div class="card mb-0" (click)="this.itemDialog = true">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
@@ -71,11 +71,11 @@
       <span class="text-500">newly registered</span> -->
     </div>
   </div>
-  <div class="col-12 lg:col-6 xl:col-3">
+  <!-- <div class="col-12 lg:col-6 xl:col-3">
     <div class="card mb-0">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
-          <!-- <span class="block text-500 font-medium mb-3">Comments</span> -->
+          <span class="block text-500 font-medium mb-3">Comments</span>
           <div class="text-900 font-medium text-xl">Pay Bill</div>
         </div>
         <div
@@ -85,10 +85,10 @@
           <i class="pi pi-wallet text-purple-500 text-xl"></i>
         </div>
       </div>
-      <!-- <span class="text-green-500 font-medium">85 </span>
-      <span class="text-500">responded</span> -->
+      <span class="text-green-500 font-medium">85 </span>
+      <span class="text-500">responded</span>
     </div>
-  </div>
+  </div> -->
   <div class="col-12">
     <div class="card px-6 py-6">
       <!-- [(selection)]="selectedProducts" -->
@@ -99,7 +99,7 @@
         responsiveLayout="scroll"
         [rows]="10"
         [globalFilterFields]="['chequePayTo']"
-        (rowsChange)="getAllInvoices(10, 'DESC')"
+        (rowsChange)="getAllInvoices()"
         [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         selectionMode="multiple"
@@ -111,7 +111,7 @@
             class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
           >
             <div class="flex gap-2">
-              <span class="block mt-2 md:mt-0 p-input-icon-left">
+              <!-- <span class="block mt-2 md:mt-0 p-input-icon-left">
                 <i class="pi pi-search"></i>
                 <input
                   pInputText
@@ -120,37 +120,17 @@
                   placeholder="Search..."
                   class="w-full sm:w-auto"
                 />
-              </span>
+              </span> -->
               <button
                 pButton
                 pRipple
                 label="Refresh"
                 icon="pi pi-refresh"
                 (click)="reload()"
-              >
-                <!-- [routerLink]="'/cheque/search'" -->
-              </button>
-              <span
-                class="flex gap-2 justify-content-center align-items-center"
-              >
-                <button
-                  pButton
-                  pRipple
-                  [label]="sum ? 'Sum : ' + (sum | currency : 'AED') : 'Sum'"
-                  icon="pi pi-check"
-                  (click)="calcSum()"
-                  class="p-button-text"
-                ></button>
-              </span>
-              <!-- <p-dropdown
-                [options]="cities"
-                [(ngModel)]="selectedDrop"
-                placeholder="Select a Section"
-                [showClear]="true"
-              ></p-dropdown> -->
+              ></button>
             </div>
             <div class="flex gap-2">
-              <button pButton label="Reset" (click)="getAllCheque()"></button>
+              <button pButton label="Reset" (click)="AdvanceSearch()"></button>
               <button
                 pButton
                 pRipple
@@ -161,14 +141,14 @@
               >
                 <!-- [routerLink]="'/cheque/search'" -->
               </button>
-              <button
+              <!-- <button
                 pButton
                 pRipple
                 label="New"
                 icon="pi pi-plus"
                 class="p-button-success"
                 (click)="openNew()"
-              ></button>
+              ></button> -->
 
               <!-- <button
                 pButton
@@ -179,7 +159,7 @@
                 (click)="deleteSelectedProducts()"
                 [disabled]="!selectedProducts || !selectedProducts.length"
               ></button> -->
-              <button
+              <!-- <button
                 pButton
                 pRipple
                 label="Export Selected"
@@ -187,7 +167,7 @@
                 class="p-button-help"
                 (click)="exportSelectedCSV()"
                 [disabled]="!selectedProducts || selectedProducts.length === 0"
-              ></button>
+              ></button> -->
               <!-- <button
                 pButton
                 pRipple
@@ -210,18 +190,15 @@
             <th pSortableColumn="projectName">
               Project <p-sortIcon field="projectName"></p-sortIcon>
             </th>
-            <th
-              pSortableColumn="supplierName"
-              (click)="getAllCheque(10, !sortDirection)"
-            >
+            <th pSortableColumn="supplierName">
               Supplier <p-sortIcon></p-sortIcon>
             </th>
             <th pSortableColumn="number">Invoice Number</th>
             <!-- <th>Image</th> -->
             <th pSortableColumn="amount">Amount</th>
             <th pSortableColumn="paidAmount">Paid Amount</th>
+            <th pSortableColumn="The Rest">The Rest</th>
             <th pSortableColumn="itemDetails">Item Details</th>
-            <th pSortableColumn="payDetails">Pay Details</th>
             <!-- <th pSortableColumn="rating">
               Reviews <p-sortIcon field="rating"></p-sortIcon>
             </th> -->
@@ -260,7 +237,15 @@
             </td>
             <td style="width: 14%; min-width: 10rem">
               <span class="p-column-title">paidAmount</span>
-              {{ product.paidAmount || "-" }}
+              {{ product.paidAmount | currency : "AED" || "-" }}
+            </td>
+            <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">The Rest</span>
+              {{
+                product.paidAmount
+                  ? (product.amount - product.paidAmount | currency : "AED")
+                  : "-"
+              }}
             </td>
             <td
               style="width: 14%; min-width: 10rem"
@@ -268,10 +253,6 @@
             >
               <span class="p-column-title">itemDetails</span>
               Item Details
-            </td>
-            <td style="width: 14%; min-width: 10rem">
-              <span class="p-column-title">payDetails</span>
-              {{ product.paidAmount ? "Pay Details" : "-" }}
             </td>
             <!-- <td style="width: 14%; min-width: 10rem">
               <span class="p-column-title">Is Payed</span>
@@ -292,21 +273,21 @@
                   pRipple
                   icon="pi pi-check"
                   class="p-button-rounded p-button-success mr-2"
-                  (click)="chequeUpdateStatus(product)"
+                  (click)="payModal(product)"
                 ></button>
-                <button
+                <!-- <button
                   pButton
                   pRipple
                   icon="pi pi-pencil"
                   class="p-button-rounded p-button-success mr-2"
                   (click)="editProduct(product)"
-                ></button>
+                ></button> -->
                 <button
                   pButton
                   pRipple
                   icon="pi pi-trash"
                   class="p-button-rounded p-button-warning"
-                  (click)="deleteCheque(product)"
+                  (click)="deleteInvoice(product)"
                 ></button>
               </div>
             </td>
@@ -484,6 +465,55 @@
           icon="pi pi-check"
           class="p-button-text"
           (click)="addNewItem()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Pay Bill -->
+    <!-- Pay Bill -->
+    <!-- Pay Bill -->
+    <p-dialog
+      [(visible)]="paymentDialog"
+      [style]="{ width: '600px', height: '330px' }"
+      header="Add New Item"
+      [modal]="true"
+      class="p-fluid"
+      [formGroup]="billForm"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <div class="field col-12">
+          <label htmlFor="name"> Payment Amount </label>
+          <input pInputText formControlName="amount" type="text" />
+        </div>
+        <div class="field col-12">
+          <label>Invoice Date</label>
+          <p-calendar
+            required
+            formControlName="paymentDate"
+            dateFormat="dd/mm/yy"
+          ></p-calendar>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="this.paymentDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="payBill()"
         ></button>
       </ng-template>
     </p-dialog>
@@ -672,7 +702,7 @@
         class="flex flex-column justify-content-md-end"
       >
         <p-tabView>
-          <p-tabPanel header="Table 1">
+          <p-tabPanel header="Item Details">
             <p-table
               [value]="invoiceItem"
               [tableStyle]="{ 'min-width': '100%' }"
@@ -689,15 +719,18 @@
                 <tr>
                   <td>{{ product?.item.name }}</td>
                   <td>{{ product?.quantity }}</td>
-                  <td>{{ product?.price }}</td>
-                  <td>{{ product?.total }}</td>
+                  <td>{{ product?.price | currency : "AED" }}</td>
+                  <td>{{ product?.total | currency : "AED" }}</td>
                 </tr>
               </ng-template>
             </p-table>
           </p-tabPanel>
 
-          <p-tabPanel header="Table 2">
-            <p-table [value]="products" [tableStyle]="{ 'min-width': '100%' }">
+          <p-tabPanel header="Payment Details">
+            <p-table
+              [value]="invoicePayment"
+              [tableStyle]="{ 'min-width': '100%' }"
+            >
               <ng-template pTemplate="header">
                 <tr>
                   <th>Date</th>
@@ -706,8 +739,8 @@
               </ng-template>
               <ng-template pTemplate="body" let-product>
                 <tr>
-                  <td>{{ product?.code }}</td>
-                  <td>{{ product?.name }}</td>
+                  <td>{{ product?.paymentDate | date : "dd/MM/yyyy" }}</td>
+                  <td>{{ product?.amount | currency : "AED" }}</td>
                 </tr>
               </ng-template>
             </p-table>
@@ -732,6 +765,151 @@
           class="p-button-text"
           (click)="addInvoice()"
         ></button> -->
+      </ng-template>
+    </p-dialog>
+
+    <!-- Delete Item -->
+    <!-- Delete Item -->
+    <!-- Delete Item -->
+
+    <p-dialog
+      [(visible)]="deleteProductDialog"
+      header="Confirm"
+      [modal]="true"
+      [style]="{ width: '450px' }"
+    >
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="selectedInvoice"
+          >Are you sure you want to delete
+          <b>{{ selectedInvoice?.supplierName }}</b> Invoice?</span
+        >
+      </div>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          icon="pi pi-times"
+          class="p-button-text"
+          label="No"
+          (click)="deleteProductDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          icon="pi pi-check"
+          class="p-button-text"
+          label="Yes"
+          (click)="confirmDelete()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Search on Cheque -->
+    <!-- Search on Cheque -->
+    <!-- Search on Cheque -->
+
+    <p-dialog
+      [(visible)]="searchDialog"
+      [style]="{ width: '600px', height: '570px' }"
+      header="Search"
+      [modal]="true"
+      class="p-fluid"
+      [formGroup]="searchForm"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <div class="field">
+          <label for="name"> Supplier </label>
+          <p-autoComplete
+            formControlName="supplierId"
+            [suggestions]="filteredSuppliers"
+            (completeMethod)="filterCountry($event, 'supplier')"
+            (keydown)="onKeydown($event, invoiceForm, 'supplier')"
+          ></p-autoComplete>
+        </div>
+
+        <div class="field">
+          <label htmlFor="projectId"> Project </label>
+          <p-autoComplete
+            formControlName="projectId"
+            [suggestions]="filteredProjects"
+            (completeMethod)="filterCountry($event, 'project')"
+            (keydown)="onKeydown($event, invoiceForm, 'project')"
+          ></p-autoComplete>
+        </div>
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">Invoice Number</label>
+            <p-inputNumber
+              id="price"
+              formControlName="number"
+              mode="currency"
+              currency="AED"
+              locale="en-US"
+              required
+            ></p-inputNumber>
+          </div>
+        </div>
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label htmlFor="state">Taxable</label>
+            <p-selectButton
+              formControlName="taxable"
+              [options]="taxableOpt"
+              optionLabel="label"
+              optionValue="value"
+            ></p-selectButton>
+          </div>
+        </div>
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">Start Data</label>
+            <p-calendar
+              required
+              formControlName="startDate"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
+          </div>
+        </div>
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price">End Data</label>
+            <p-calendar
+              required
+              formControlName="endDate"
+              dateFormat="dd/mm/yy"
+            ></p-calendar>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <div class="flex justify-content-end align-items-center mt-1">
+          <div>
+            <button
+              pButton
+              pRipple
+              label="Cancel"
+              icon="pi pi-times"
+              class="p-button-text"
+              (click)="this.searchDialog = false"
+            ></button>
+            <button
+              pButton
+              pRipple
+              label="Search"
+              icon="pi pi-check"
+              class="p-button-text"
+              (click)="AdvanceSearch()"
+            ></button>
+          </div>
+        </div>
       </ng-template>
     </p-dialog>
   </div>

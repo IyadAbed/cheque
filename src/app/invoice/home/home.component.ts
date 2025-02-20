@@ -5,6 +5,7 @@ import { MessageService } from 'primeng/api';
 import { DatePipe } from '@angular/common';
 import { InvoiceService } from '../invoice.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-home',
@@ -18,6 +19,9 @@ export class HomeComponent implements OnInit {
   itemDialog: boolean = false;
   invoiceDialog: boolean = false;
   itemDetailsDialog: boolean = false;
+  paymentDialog: boolean = false;
+  searchDialog: boolean = false;
+  deleteProductDialog: boolean = false;
   allSuppliers: Supplier[] = [];
   allItem: Item[] = [];
   allProjects: Project[] = [];
@@ -25,14 +29,17 @@ export class HomeComponent implements OnInit {
   projectForm!: FormGroup;
   itemForm!: FormGroup;
   invoiceForm!: FormGroup;
+  billForm!: FormGroup;
   cols: any[] = [];
   products: InvoiceRes[] = [];
   selectedInvoice: InvoiceRes | null = null;
   invoiceItem: InvoiceItem[] = [];
   invoicePayment: Payment[] = [];
-
+  searchForm!: FormGroup;
+  paymentAmount: string = '';
   // allSuppliers: Supplier[] = [];
   // allProjects: Project[] = [];
+  taxType: any[] = [];
   allItems: Item[] = [];
   filteredSuppliers: Supplier[];
   filteredProjects: Project[];
@@ -53,21 +60,12 @@ export class HomeComponent implements OnInit {
     this.getAllProjects();
     this.getAllSuppliers();
     this.getAllInvoices();
-    // this.https
-    //   .sendPostRequest(
-    //     'users',
-    //     {
-    //       name: 'Diaa',
-    //       email: 'diaa@mo3alam.com',
-    //       password: 'Admin@123',
-    //       phone: '971551263303',
-    //       role: 'ADMIN_INVOICE',
-    //     },
-    //     8080
-    //   )
-    //   .subscribe((res) => {
-    //     console.log('res', res);
-    //   });
+
+    this.taxType = [
+      { label: 'Credit', value: 'CREDIT' },
+      { label: 'Debit', value: 'DEBIT' },
+    ];
+
     this.supplierForm = fb.group({
       name: ['', Validators.required],
       trnNumber: [''],
@@ -79,6 +77,10 @@ export class HomeComponent implements OnInit {
       name: ['', Validators.required],
       description: [''],
     });
+    this.billForm = fb.group({
+      amount: ['', Validators.required],
+      paymentDate: ['', Validators.required],
+    });
     this.invoiceForm = fb.group({
       supplierId: ['', Validators.required],
       projectId: ['', Validators.required],
@@ -87,6 +89,15 @@ export class HomeComponent implements OnInit {
       amount: ['', Validators.required],
       items: this.fb.array([]),
       taxable: ['', Validators.required],
+    });
+    this.searchForm = fb.group({
+      supplierId: [null],
+      projectId: [null],
+      number: [null],
+      startDate: [null],
+      endDate: [null],
+      taxable: [null],
+      paymentStatus: [null],
     });
   }
 
@@ -241,6 +252,38 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  payModal(invoice: InvoiceRes) {
+    this.selectedInvoice = invoice;
+    this.paymentAmount = (
+      invoice.amount - (invoice.paidAmount ?? 0)
+    ).toString();
+    this.billForm.patchValue({
+      amount: this.paymentAmount,
+    });
+    this.paymentDialog = true;
+  }
+
+  payBill() {
+    if (this.billForm.valid) {
+      this.https
+        .sendPostRequest(
+          'payments',
+          {
+            invoiceId: this.selectedInvoice.id,
+            amount: this.billForm.value.amount,
+            paymentDate: this.normalizeDate(this.billForm.value.paymentDate),
+          },
+          8080
+        )
+        .subscribe(() => {
+          this.paymentDialog = false;
+          this.getAllInvoices();
+        });
+    } else {
+      this.billForm.markAllAsTouched();
+    }
+  }
+
   openDetails(invoice: InvoiceRes) {
     this.selectedInvoice = invoice;
     this.https
@@ -251,20 +294,16 @@ export class HomeComponent implements OnInit {
         this.itemDetailsDialog = true;
       });
     this.https
-      .sendGetRequest<any, Payment[]>(`payments/${invoice.id}`, 8080)
+      .sendGetRequest<any, Payment[]>(`payments/invoice/${invoice.id}`, 8080)
       .subscribe((res) => {
         console.log('res Payment', res);
         this.invoicePayment = res;
       });
   }
 
-  getAllInvoices(pageSize?: any, sort?: any) {
+  getAllInvoices() {
     this.https
-      .sendPostRequest<any, InvoiceRes[]>(
-        'invoices/search',
-        { pageSize, sort },
-        8080
-      )
+      .sendPostRequest<InvoiceReq, InvoiceRes[]>('invoices/search', {}, 8080)
       .subscribe((res) => {
         this.products = res;
       });
@@ -394,6 +433,70 @@ export class HomeComponent implements OnInit {
       this.invoiceForm.markAllAsTouched();
     }
   }
+
+  deleteInvoice(invoice: InvoiceRes) {
+    if (invoice) {
+      this.selectedInvoice = invoice;
+      this.deleteProductDialog = true;
+    }
+  }
+
+  confirmDelete() {
+    this.https
+      .sendDeleteRequest(`invoices/${this.selectedInvoice.id}`, 8080, {}, 'v1')
+      .subscribe((res) => {
+        this.deleteProductDialog = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Successful',
+          detail: 'Cheque Deleted',
+          life: 3000,
+        });
+        this.selectedInvoice = null;
+        this.AdvanceSearch();
+      });
+    // this.products = this.products.filter((val) => val.id !== this.product.id);
+  }
+
+  reload() {
+    window.location.reload();
+  }
+
+  onGlobalFilter(table: Table, event: Event) {
+    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+  }
+
+  AdvanceSearch() {
+    console.log('Form Search', this.searchForm.value);
+    let body = this.searchForm.value;
+    // supplierId
+    // projectId
+    if (!!body?.supplierId) {
+      body.supplierId = this.allSuppliers.find(
+        (sub) => sub.name == body.supplierId
+      )?.id;
+    }
+    if (!!body?.projectId) {
+      body.projectId = this.allProjects.find(
+        (sub) => sub.name == body.projectId
+      )?.id;
+    }
+    this.https
+      .sendPostRequest<InvoiceReq, InvoiceRes[]>(
+        `invoices/search`,
+        { ...body },
+        8080,
+        false,
+        'v1'
+      )
+      .subscribe({
+        next: (res) => {
+          this.products = res;
+          this.searchForm.reset();
+          this.searchDialog = false;
+        },
+      });
+  }
 }
 
 export interface Supplier {
@@ -431,6 +534,15 @@ export interface InvoiceRes {
   paymentStatus: 'PAID' | 'UNPAID' | string; // adjust union as needed
   createdAt: string; // Alternatively, use Date
   updatedAt: string; // Alternatively, use Date
+}
+export interface InvoiceReq {
+  supplierId?: string;
+  projectId?: string;
+  number?: string;
+  startDate?: string;
+  endDate?: string;
+  taxable?: boolean;
+  paymentStatus?: string;
 }
 
 interface ItemRes {
