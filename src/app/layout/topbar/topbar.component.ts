@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { LayoutService } from '../service/layout.service';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-topbar',
@@ -9,6 +10,7 @@ import { Router } from '@angular/router';
 })
 export class TopbarComponent {
   items!: MenuItem[];
+  selectedLanguage: 'en' | 'ar' = 'en';
 
   logOut() {
     localStorage.removeItem('user');
@@ -21,5 +23,18 @@ export class TopbarComponent {
 
   @ViewChild('topbarmenu') menu!: ElementRef;
 
-  constructor(public layoutService: LayoutService, private router: Router) {}
+  constructor(
+    public layoutService: LayoutService,
+    private router: Router,
+    private translation: TranslationService
+  ) {}
+
+  setLanguage() {
+    const lang = this.selectedLanguage === 'en' ? 'ar' : 'en';
+    localStorage.setItem('selectedLanguage', lang);
+    this.selectedLanguage = lang;
+
+    this.translation.setLanguage(lang);
+    // window.location.reload();
+  }
 }

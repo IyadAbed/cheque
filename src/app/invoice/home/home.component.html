@@ -4,7 +4,7 @@
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Add Invoice</span> -->
-          <div class="text-900 font-medium text-xl">Add Invoice</div>
+          <div class="text-900 font-medium text-xl" translate>Add Invoice</div>
         </div>
         <div
           class="flex align-items-center justify-content-center bg-blue-100 border-round"
@@ -22,7 +22,7 @@
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Orders</span> -->
-          <div class="text-900 font-medium text-xl">Add Supplier</div>
+          <div class="text-900 font-medium text-xl" translate>Add Supplier</div>
         </div>
         <div
           class="flex align-items-center justify-content-center bg-teal-200 border-round"
@@ -40,7 +40,7 @@
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Revenue</span> -->
-          <div class="text-900 font-medium text-xl">Add Project</div>
+          <div class="text-900 font-medium text-xl" translate>Add Project</div>
         </div>
         <div
           class="flex align-items-center justify-content-center bg-orange-100 border-round"
@@ -58,7 +58,7 @@
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Add Item</span> -->
-          <div class="text-900 font-medium text-xl">Add Item</div>
+          <div class="text-900 font-medium text-xl" translate>Add Item</div>
         </div>
         <div
           class="flex align-items-center justify-content-center bg-cyan-100 border-round"
@@ -124,17 +124,21 @@
               <button
                 pButton
                 pRipple
-                label="Refresh"
+                label="{{ 'Refresh' | translate }}"
                 icon="pi pi-refresh"
                 (click)="reload()"
               ></button>
             </div>
             <div class="flex gap-2">
-              <button pButton label="Reset" (click)="AdvanceSearch()"></button>
+              <button
+                pButton
+                label="{{ 'Reset' | translate }}"
+                (click)="AdvanceSearch()"
+              ></button>
               <button
                 pButton
                 pRipple
-                label="Search"
+                label="{{ 'Search' | translate }}"
                 icon="pi pi-search"
                 class="p-button-warning"
                 (click)="searchDialog = true"
@@ -184,21 +188,21 @@
             <th style="width: 3rem">
               <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
             </th>
-            <th pSortableColumn="invoiceDate">
+            <th pSortableColumn="number" translate>Invoice Number</th>
+            <th pSortableColumn="invoiceDate" translate>
               Invoice Date <p-sortIcon field="invoiceDate"></p-sortIcon>
             </th>
-            <th pSortableColumn="projectName">
+            <th pSortableColumn="projectName" translate>
               Project <p-sortIcon field="projectName"></p-sortIcon>
             </th>
-            <th pSortableColumn="supplierName">
+            <th pSortableColumn="supplierName" translate>
               Supplier <p-sortIcon></p-sortIcon>
             </th>
-            <th pSortableColumn="number">Invoice Number</th>
             <!-- <th>Image</th> -->
-            <th pSortableColumn="amount">Amount</th>
-            <th pSortableColumn="paidAmount">Paid Amount</th>
-            <th pSortableColumn="The Rest">The Rest</th>
-            <th pSortableColumn="itemDetails">Item Details</th>
+            <th pSortableColumn="amount" translate>Amount</th>
+            <th pSortableColumn="paidAmount" translate>Paid Amount</th>
+            <th pSortableColumn="The Rest" translate>The Rest</th>
+            <th pSortableColumn="itemDetails" translate>Item Details</th>
             <!-- <th pSortableColumn="rating">
               Reviews <p-sortIcon field="rating"></p-sortIcon>
             </th> -->
@@ -211,6 +215,12 @@
             <td>
               <p-tableCheckbox [value]="product"></p-tableCheckbox>
             </td>
+            <td style="width: 14%; min-width: 8rem color-Red">
+              <span class="p-column-title">Invoice Number</span>
+              <p>
+                <span> {{ product.number }} </span>
+              </p>
+            </td>
             <td style="width: 14%; min-width: 10rem">
               <span class="p-column-title">invoiceDate</span>
               {{ product.invoiceDate | date : "dd/MM/yyyy" }}
@@ -222,12 +232,6 @@
             <td style="width: 14%; min-width: 10rem">
               <span class="p-column-title">Supplier</span>
               {{ product.supplierName }}
-            </td>
-            <td style="width: 14%; min-width: 8rem color-Red">
-              <span class="p-column-title">Invoice Number</span>
-              <p>
-                <span> {{ product.number }} </span>
-              </p>
             </td>
             <td style="width: 14%; min-width: 8rem">
               <span class="p-column-title">amount</span>
@@ -250,6 +254,8 @@
             <td
               style="width: 14%; min-width: 10rem"
               (click)="openDetails(product)"
+              translate
+              class="cursor-pointer"
             >
               <span class="p-column-title">itemDetails</span>
               Item Details
@@ -693,7 +699,7 @@
     <p-dialog
       [(visible)]="itemDetailsDialog"
       [style]="{ width: '50%', height: '70%' }"
-      header="Show Details"
+      header="{{ 'Show Details' | translate }}"
       [modal]="true"
       class="p-fluid"
     >
@@ -702,22 +708,22 @@
         class="flex flex-column justify-content-md-end"
       >
         <p-tabView>
-          <p-tabPanel header="Item Details">
+          <p-tabPanel header="{{ 'Item Details' | translate }}">
             <p-table
               [value]="invoiceItem"
               [tableStyle]="{ 'min-width': '100%' }"
             >
               <ng-template pTemplate="header">
                 <tr>
-                  <th>Name</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
-                  <th>Total Price</th>
+                  <th translate>Name</th>
+                  <th translate>Quantity</th>
+                  <th translate>Price</th>
+                  <th translate>Total Price</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-product>
                 <tr>
-                  <td>{{ product?.item.name }}</td>
+                  <td>{{ product?.item?.name }}</td>
                   <td>{{ product?.quantity }}</td>
                   <td>{{ product?.price | currency : "AED" }}</td>
                   <td>{{ product?.total | currency : "AED" }}</td>
@@ -726,15 +732,15 @@
             </p-table>
           </p-tabPanel>
 
-          <p-tabPanel header="Payment Details">
+          <p-tabPanel header="{{ 'Payment Details' | translate }}">
             <p-table
               [value]="invoicePayment"
               [tableStyle]="{ 'min-width': '100%' }"
             >
               <ng-template pTemplate="header">
                 <tr>
-                  <th>Date</th>
-                  <th>Paid Value</th>
+                  <th translate>Date</th>
+                  <th translate>Paid Value</th>
                 </tr>
               </ng-template>
               <ng-template pTemplate="body" let-product>
@@ -752,7 +758,7 @@
         <button
           pButton
           pRipple
-          label="Cancel"
+          label="{{ 'Cancel' | translate }}"
           icon="pi pi-times"
           class="p-button-text"
           (click)="itemDetailsDialog = false"
@@ -805,9 +811,9 @@
       </ng-template>
     </p-dialog>
 
-    <!-- Search on Cheque -->
-    <!-- Search on Cheque -->
-    <!-- Search on Cheque -->
+    <!-- Search on Invoice -->
+    <!-- Search on Invoice -->
+    <!-- Search on Invoice -->
 
     <p-dialog
       [(visible)]="searchDialog"

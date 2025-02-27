@@ -6,6 +6,8 @@ import { DatePipe } from '@angular/common';
 import { InvoiceService } from '../invoice.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { Table } from 'primeng/table';
+import { Subscription } from 'rxjs';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-home',
@@ -44,18 +46,27 @@ export class HomeComponent implements OnInit {
   filteredSuppliers: Supplier[];
   filteredProjects: Project[];
   filteredItem: Item[];
+  langSelected: 'en' | 'ar' | string = 'ar';
   taxableOpt = [
     { label: 'Taxable', value: true },
     { label: 'Non Taxable', value: false },
   ];
+
+  langSubscription: Subscription;
 
   constructor(
     private fb: FormBuilder,
     private https: HttpService,
     private messageService: MessageService,
     private datePipe: DatePipe,
+    private translationService: TranslationService,
     private invoiceService: InvoiceService
   ) {
+    this.langSubscription = this.translationService
+    .getLangSubject()
+    .subscribe((lang) => {
+      this.langSelected = lang;
+    });
     this.getAllItems();
     this.getAllProjects();
     this.getAllSuppliers();

@@ -43,6 +43,10 @@
       <i class="pi pi-user"></i>
       <span>Profile</span>
     </button> -->
+    <button class="p-link layout-topbar-button" (click)="setLanguage()">
+      <i class="pi pi-language"></i> {{ selectedLanguage }}
+      <span translate>Language {{ selectedLanguage }}</span>
+    </button>
     <button class="p-link layout-topbar-button" (click)="logOut()">
       <i class="pi pi-sign-out"></i>
       <!-- <span>Settings</span> -->

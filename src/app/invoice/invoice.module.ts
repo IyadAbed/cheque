@@ -33,6 +33,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { AddInvoiceComponent } from './add-invoice/add-invoice.component';
 import { PayBillComponent } from './pay-bill/pay-bill.component';
 import { TabViewModule } from 'primeng/tabview';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [HomeComponent, AddInvoiceComponent, PayBillComponent],
@@ -69,6 +70,7 @@ import { TabViewModule } from 'primeng/tabview';
     ToastModule,
     RadioButtonModule,
     SelectButtonModule,
+    TranslateModule,
   ],
 })
 export class InvoiceModule {}
