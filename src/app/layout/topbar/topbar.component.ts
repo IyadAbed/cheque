@@ -11,9 +11,11 @@ import { TranslationService } from '../../core/services/translation.service';
 export class TopbarComponent {
   items!: MenuItem[];
   selectedLanguage: 'en' | 'ar' = 'en';
+  role: string = localStorage.getItem('role') || '';
 
   logOut() {
     localStorage.removeItem('user');
+    localStorage.removeItem('role');
     this.router.navigate(['/auth']);
   }
 
