@@ -63,10 +63,10 @@ export class HomeComponent implements OnInit {
     private invoiceService: InvoiceService
   ) {
     this.langSubscription = this.translationService
-    .getLangSubject()
-    .subscribe((lang) => {
-      this.langSelected = lang;
-    });
+      .getLangSubject()
+      .subscribe((lang) => {
+        this.langSelected = lang;
+      });
     this.getAllItems();
     this.getAllProjects();
     this.getAllSuppliers();
@@ -113,9 +113,14 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.invoiceForm.valueChanges.subscribe((val) => {
-    //   console.log('val', val);
-    // });
+    this.items.valueChanges.subscribe(() => {
+      this.calculateInvoiceTotal();
+    });
+
+    // Listen for changes in the taxable field
+    this.invoiceForm.get('taxable')?.valueChanges.subscribe(() => {
+      this.calculateInvoiceTotal();
+    });
   }
 
   normalizeDate(date: any): string | null {
@@ -133,12 +138,14 @@ export class HomeComponent implements OnInit {
         this.invoiceService.allSuppliers.next(res);
       });
   }
+
   getAllItems() {
     this.https.sendGetRequest<any, Item[]>('items', 8080).subscribe((res) => {
       this.allItem = res;
       this.invoiceService.allItem.next(res);
     });
   }
+
   getAllProjects() {
     this.https
       .sendGetRequest<any, Project[]>('projects', 8080)
@@ -324,15 +331,59 @@ export class HomeComponent implements OnInit {
     return this.invoiceForm.get('items') as FormArray;
   }
 
+  // generateNewItem() {
+  //   const FormArr = this.fb.group({
+  //     itemId: ['', Validators.required],
+  //     itemDescription: [''],
+  //     quantity: [],
+  //     price: [],
+  //     total: [],
+  //   });
+  //   this.items.push(FormArr);
+  // }
+
   generateNewItem() {
-    const FormArr = this.fb.group({
+    const itemForm = this.fb.group({
       itemId: ['', Validators.required],
       itemDescription: [''],
-      quantity: [],
-      price: [],
-      total: [],
+      quantity: [0, Validators.required],
+      price: [0, Validators.required],
+      total: [{ value: 0, disabled: true }], // Read-only field
     });
-    this.items.push(FormArr);
+
+    // Subscribe to changes in quantity or price and update total
+    itemForm.valueChanges.subscribe(() => {
+      this.updateItemTotal(itemForm);
+    });
+
+    this.items.push(itemForm);
+  }
+
+  updateItemTotal(item: FormGroup) {
+    const quantity = item.get('quantity')?.value || 0;
+    const price = item.get('price')?.value || 0;
+    const total = quantity * price;
+
+    item.get('total')?.setValue(total, { emitEvent: false }); // Prevent infinite loop
+    this.calculateInvoiceTotal();
+  }
+
+  calculateInvoiceTotal() {
+    let totalAmount = this.items.controls.reduce((sum, item) => {
+      return sum + (item.get('total')?.value || 0);
+    }, 0);
+
+    // If taxable, add 5% tax
+    const isTaxable = this.invoiceForm.get('taxable')?.value;
+    if (isTaxable?.value) {
+      console.log(isTaxable);
+
+      totalAmount *= 1.05; // Add 5%
+    } else {
+      totalAmount = totalAmount;
+    }
+
+    this.invoiceForm.get('amount')?.setValue(totalAmount, { emitEvent: false });
   }
 
   removeItem(index: number) {
@@ -439,6 +490,7 @@ export class HomeComponent implements OnInit {
       this.https.sendPostRequest('invoices', body, 8080).subscribe(() => {
         this.invoiceDialog = false;
         this.invoiceForm.reset();
+        this.getAllInvoices();
       });
     } else {
       this.invoiceForm.markAllAsTouched();

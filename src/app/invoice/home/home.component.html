@@ -350,7 +350,7 @@
     <p-dialog
       [(visible)]="supplierDialog"
       [style]="{ width: '600px', height: '320px' }"
-      header="Add New Supplier"
+      header="{{ 'Add New Supplier' | translate }}"
       [modal]="true"
       class="p-fluid"
       [formGroup]="supplierForm"
@@ -360,11 +360,11 @@
         class="flex flex-column justify-content-md-end"
       >
         <div class="field">
-          <label htmlFor="name">Supplier Name</label>
+          <label htmlFor="name" translate>Supplier Name</label>
           <input pInputText formControlName="name" type="text" />
         </div>
         <div class="field">
-          <label htmlFor="name">TRN Number</label>
+          <label htmlFor="name" translate>TRN Number</label>
           <input pInputText formControlName="trnNumber" type="text" />
         </div>
       </ng-template>
@@ -373,7 +373,7 @@
         <button
           pButton
           pRipple
-          label="Cancel"
+          label="{{ 'Cancel' | translate }}"
           icon="pi pi-times"
           class="p-button-text"
           (click)="this.supplierDialog = false"
@@ -381,7 +381,7 @@
         <button
           pButton
           pRipple
-          label="Save"
+          label="{{ 'Save' | translate }}"
           icon="pi pi-check"
           class="p-button-text"
           (click)="addNewSupplier()"
@@ -395,7 +395,7 @@
     <p-dialog
       [(visible)]="projectDialog"
       [style]="{ width: '600px', height: '240px' }"
-      header="Add New Project"
+      header="{{ 'Add New Project' | translate }}"
       [modal]="true"
       class="p-fluid"
       [formGroup]="projectForm"
@@ -405,7 +405,7 @@
         class="flex flex-column justify-content-md-end"
       >
         <div class="field">
-          <label htmlFor="name">Project Name</label>
+          <label htmlFor="name" translate>Project Name</label>
           <input pInputText formControlName="name" type="text" />
         </div>
       </ng-template>
@@ -414,7 +414,7 @@
         <button
           pButton
           pRipple
-          label="Cancel"
+          label="{{ 'Cancel' | translate }}"
           icon="pi pi-times"
           class="p-button-text"
           (click)="this.projectDialog = false"
@@ -422,7 +422,7 @@
         <button
           pButton
           pRipple
-          label="Save"
+          label="{{ 'Save' | translate }}"
           icon="pi pi-check"
           class="p-button-text"
           (click)="addNewProject()"
@@ -436,7 +436,7 @@
     <p-dialog
       [(visible)]="itemDialog"
       [style]="{ width: '600px', height: '330px' }"
-      header="Add New Item"
+      header="{{ 'Add New Item' | translate }}"
       [modal]="true"
       class="p-fluid"
       [formGroup]="itemForm"
@@ -446,11 +446,11 @@
         class="flex flex-column justify-content-md-end"
       >
         <div class="field">
-          <label htmlFor="name">Item Name</label>
+          <label htmlFor="name" translate>Item Name</label>
           <input pInputText formControlName="name" type="text" />
         </div>
         <div class="field">
-          <label htmlFor="description">Item Description</label>
+          <label htmlFor="description" translate>Item Description</label>
           <input pInputText formControlName="description" type="text" />
         </div>
       </ng-template>
@@ -459,7 +459,7 @@
         <button
           pButton
           pRipple
-          label="Cancel"
+          label="{{ 'Cancel' | translate }}"
           icon="pi pi-times"
           class="p-button-text"
           (click)="this.itemDialog = false"
@@ -467,7 +467,7 @@
         <button
           pButton
           pRipple
-          label="Save"
+          label="{{ 'Save' | translate }}"
           icon="pi pi-check"
           class="p-button-text"
           (click)="addNewItem()"
@@ -481,7 +481,7 @@
     <p-dialog
       [(visible)]="paymentDialog"
       [style]="{ width: '600px', height: '330px' }"
-      header="Add New Item"
+      header="{{ 'Pay Bill' | translate }}"
       [modal]="true"
       class="p-fluid"
       [formGroup]="billForm"
@@ -491,11 +491,11 @@
         class="flex flex-column justify-content-md-end"
       >
         <div class="field col-12">
-          <label htmlFor="name"> Payment Amount </label>
+          <label htmlFor="name" translate>Payment Amount</label>
           <input pInputText formControlName="amount" type="text" />
         </div>
         <div class="field col-12">
-          <label>Invoice Date</label>
+          <label translate>Invoice Date</label>
           <p-calendar
             required
             formControlName="paymentDate"
@@ -508,7 +508,7 @@
         <button
           pButton
           pRipple
-          label="Cancel"
+          label="{{ 'Cancel' | translate }}"
           icon="pi pi-times"
           class="p-button-text"
           (click)="this.paymentDialog = false"
@@ -516,7 +516,7 @@
         <button
           pButton
           pRipple
-          label="Save"
+          label="{{ 'Save' | translate }}"
           icon="pi pi-check"
           class="p-button-text"
           (click)="payBill()"
@@ -530,7 +530,7 @@
     <p-dialog
       [(visible)]="invoiceDialog"
       [style]="{ width: '800px', height: '90%' }"
-      header="Add New Invoice"
+      header="{{ 'Add New Invoice' | translate }}"
       [modal]="true"
       class="p-fluid"
       [formGroup]="invoiceForm"
@@ -541,7 +541,7 @@
         [formGroup]="invoiceForm"
       >
         <div class="field col-12">
-          <label for="supplierId">Supplier</label>
+          <label for="supplierId" translate>Supplier</label>
           <p-autoComplete
             formControlName="supplierId"
             [suggestions]="filteredSuppliers"
@@ -550,7 +550,7 @@
           ></p-autoComplete>
         </div>
         <div class="field col-12">
-          <label for="supplierId">Project</label>
+          <label for="supplierId" translate>Project</label>
           <p-autoComplete
             formControlName="projectId"
             [suggestions]="filteredProjects"
@@ -559,11 +559,11 @@
           ></p-autoComplete>
         </div>
         <div class="field col-12">
-          <label htmlFor="number">Invoice Number</label>
+          <label htmlFor="number" translate>Invoice Number</label>
           <input pInputText formControlName="number" type="text" />
         </div>
         <div class="field col-12">
-          <label>Invoice Date</label>
+          <label translate>Invoice Date</label>
           <p-calendar
             required
             formControlName="invoiceDate"
@@ -577,7 +577,7 @@
             [formGroupName]="i"
           >
             <div class="field col-12 md:col-4">
-              <label for="supplierId">Item</label>
+              <label for="supplierId" translate>Item</label>
               <p-autoComplete
                 formControlName="itemId"
                 [suggestions]="filteredItem"
@@ -587,11 +587,13 @@
             </div>
 
             <div class="field col-12 md:col-4">
-              <label htmlFor="itemDescription">Item Description</label>
+              <label htmlFor="itemDescription" translate
+                >Item Description</label
+              >
               <input pInputText formControlName="itemDescription" type="text" />
             </div>
             <div class="field col-12 md:col-4">
-              <label htmlFor="quantity">Item quantity</label>
+              <label htmlFor="quantity" translate>Item quantity</label>
               <p-inputNumber
                 id="amount"
                 formControlName="quantity"
@@ -600,7 +602,7 @@
               ></p-inputNumber>
             </div>
             <div class="field col-12 md:col-4">
-              <label htmlFor="price">Item price</label>
+              <label htmlFor="price" translate>Item price</label>
               <p-inputNumber
                 id="amount"
                 formControlName="price"
@@ -611,7 +613,7 @@
               ></p-inputNumber>
             </div>
             <div class="field col-12 md:col-4">
-              <label htmlFor="total">Total</label>
+              <label htmlFor="total" translate>Total</label>
               <p-inputNumber
                 id="amount"
                 formControlName="total"
@@ -636,7 +638,7 @@
           <button
             pButton
             pRipple
-            label="Add Item To Invoice"
+            label="{{ 'Add Item To Invoice' | translate }}"
             icon="pi pi-plus"
             class="p-button-text"
             (click)="generateNewItem()"
@@ -644,7 +646,7 @@
         </div>
 
         <div class="field col-12">
-          <label> Taxable </label>
+          <label translate>Taxable</label>
           <p-selectButton
             [options]="taxableOpt"
             formControlName="taxable"
@@ -652,7 +654,7 @@
           ></p-selectButton>
         </div>
         <div class="field col-12">
-          <label htmlFor="amount"> Amount </label>
+          <label htmlFor="amount" translate>Amount</label>
           <p-inputNumber
             id="amount"
             formControlName="amount"
@@ -677,7 +679,7 @@
         <button
           pButton
           pRipple
-          label="Cancel"
+          label="{{ 'Cancel' | translate }}"
           icon="pi pi-times"
           class="p-button-text"
           (click)="invoiceForm = false"
@@ -685,7 +687,7 @@
         <button
           pButton
           pRipple
-          label="Save"
+          label="{{ 'Save' | translate }}"
           icon="pi pi-check"
           class="p-button-text"
           (click)="addInvoice()"
@@ -780,15 +782,16 @@
 
     <p-dialog
       [(visible)]="deleteProductDialog"
-      header="Confirm"
+      header="{{ 'Confirm' | translate }}"
       [modal]="true"
       [style]="{ width: '450px' }"
     >
       <div class="flex align-items-center justify-content-center">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
         <span *ngIf="selectedInvoice"
-          >Are you sure you want to delete
-          <b>{{ selectedInvoice?.supplierName }}</b> Invoice?</span
+          >{{ "Are you sure you want to delete" | translate }}
+          <b>{{ selectedInvoice?.supplierName }}</b>
+          {{ "Invoice" | translate }}?</span
         >
       </div>
       <ng-template pTemplate="footer">
@@ -797,7 +800,7 @@
           pRipple
           icon="pi pi-times"
           class="p-button-text"
-          label="No"
+          label="{{ 'No' | translate }}"
           (click)="deleteProductDialog = false"
         ></button>
         <button
@@ -805,7 +808,7 @@
           pRipple
           icon="pi pi-check"
           class="p-button-text"
-          label="Yes"
+          label="{{ 'Yes' | translate }}"
           (click)="confirmDelete()"
         ></button>
       </ng-template>
@@ -818,7 +821,7 @@
     <p-dialog
       [(visible)]="searchDialog"
       [style]="{ width: '600px', height: '570px' }"
-      header="Search"
+      header="{{ 'Search' | translate }}"
       [modal]="true"
       class="p-fluid"
       [formGroup]="searchForm"
@@ -828,7 +831,7 @@
         class="flex flex-column justify-content-md-end"
       >
         <div class="field">
-          <label for="name"> Supplier </label>
+          <label for="name" translate>Supplier</label>
           <p-autoComplete
             formControlName="supplierId"
             [suggestions]="filteredSuppliers"
@@ -838,7 +841,7 @@
         </div>
 
         <div class="field">
-          <label htmlFor="projectId"> Project </label>
+          <label htmlFor="projectId" translate>Project</label>
           <p-autoComplete
             formControlName="projectId"
             [suggestions]="filteredProjects"
@@ -849,7 +852,7 @@
 
         <div class="formgrid grid">
           <div class="field col">
-            <label for="price">Invoice Number</label>
+            <label for="price" translate>Invoice Number</label>
             <p-inputNumber
               id="price"
               formControlName="number"
@@ -863,7 +866,7 @@
 
         <div class="formgrid grid">
           <div class="field col">
-            <label htmlFor="state">Taxable</label>
+            <label htmlFor="state" translate>Taxable</label>
             <p-selectButton
               formControlName="taxable"
               [options]="taxableOpt"
@@ -875,7 +878,7 @@
 
         <div class="formgrid grid">
           <div class="field col">
-            <label for="price">Start Data</label>
+            <label for="price" translate>Start Data</label>
             <p-calendar
               required
               formControlName="startDate"
@@ -885,7 +888,7 @@
         </div>
         <div class="formgrid grid">
           <div class="field col">
-            <label for="price">End Data</label>
+            <label for="price" translate>End Data</label>
             <p-calendar
               required
               formControlName="endDate"
@@ -901,7 +904,7 @@
             <button
               pButton
               pRipple
-              label="Cancel"
+              label="{{ 'Cancel' | translate }}"
               icon="pi pi-times"
               class="p-button-text"
               (click)="this.searchDialog = false"
@@ -909,7 +912,7 @@
             <button
               pButton
               pRipple
-              label="Search"
+              label="{{ 'Search' | translate }}"
               icon="pi pi-check"
               class="p-button-text"
               (click)="AdvanceSearch()"
