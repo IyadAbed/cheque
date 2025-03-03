@@ -49,7 +49,7 @@ export class TranslationService {
       localStorage.getItem('language') != null &&
       localStorage.getItem('language') != undefined
         ? localStorage.getItem('language')
-        : 'en';
+        : 'ar';
     return language;
   }
 

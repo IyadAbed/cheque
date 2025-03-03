@@ -243,13 +243,14 @@
               <span class="p-column-title">paidAmount</span>
               {{ product.paidAmount | currency : "AED" || "-" }}
             </td>
-            <td style="width: 14%; min-width: 10rem">
-              <span class="p-column-title">The Rest</span>
-              {{
-                product.paidAmount
-                  ? (product.amount - product.paidAmount | currency : "AED")
-                  : "-"
-              }}
+            <td style="width: 14%; min-width: 10rem" class="color-Red">
+              <span>
+                {{
+                  product.paidAmount
+                    ? (product.amount - product.paidAmount | currency : "AED")
+                    : "-"
+                }}
+              </span>
             </td>
             <td
               style="width: 14%; min-width: 10rem"
@@ -480,7 +481,7 @@
     <!-- Pay Bill -->
     <p-dialog
       [(visible)]="paymentDialog"
-      [style]="{ width: '600px', height: '330px' }"
+      [style]="{ width: '600px', height: '580px' }"
       header="{{ 'Pay Bill' | translate }}"
       [modal]="true"
       class="p-fluid"
@@ -491,16 +492,26 @@
         class="flex flex-column justify-content-md-end"
       >
         <div class="field col-12">
-          <label htmlFor="name" translate>Payment Amount</label>
-          <input pInputText formControlName="amount" type="text" />
-        </div>
-        <div class="field col-12">
           <label translate>Invoice Date</label>
           <p-calendar
             required
             formControlName="paymentDate"
             dateFormat="dd/mm/yy"
           ></p-calendar>
+        </div>
+        <div class="field col-12">
+          <label htmlFor="name" translate>Payment Amount</label>
+          <input pInputText formControlName="amount" type="text" />
+        </div>
+        <div class="field col-12">
+          <label for="price" translate>Cheque Number</label>
+          <p-inputNumber
+            id="price"
+            formControlName="number"
+            mode="decimal"
+            [useGrouping]="false"
+            required
+          ></p-inputNumber>
         </div>
       </ng-template>
 
@@ -562,14 +573,7 @@
           <label htmlFor="number" translate>Invoice Number</label>
           <input pInputText formControlName="number" type="text" />
         </div>
-        <div class="field col-12">
-          <label translate>Invoice Date</label>
-          <p-calendar
-            required
-            formControlName="invoiceDate"
-            dateFormat="dd/mm/yy"
-          ></p-calendar>
-        </div>
+
         <div formArrayName="items" class="field col-12 md:col-12">
           <div
             class="p-fluid p-formgrid grid"
@@ -643,6 +647,15 @@
             class="p-button-text"
             (click)="generateNewItem()"
           ></button>
+        </div>
+
+        <div class="field col-12">
+          <label translate>Invoice Date</label>
+          <p-calendar
+            required
+            formControlName="invoiceDate"
+            dateFormat="dd/mm/yy"
+          ></p-calendar>
         </div>
 
         <div class="field col-12">
@@ -856,9 +869,8 @@
             <p-inputNumber
               id="price"
               formControlName="number"
-              mode="currency"
-              currency="AED"
-              locale="en-US"
+              mode="decimal"
+              [useGrouping]="false"
               required
             ></p-inputNumber>
           </div>

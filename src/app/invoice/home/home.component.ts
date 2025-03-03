@@ -90,6 +90,7 @@ export class HomeComponent implements OnInit {
     });
     this.billForm = fb.group({
       amount: ['', Validators.required],
+      number: [null],
       paymentDate: ['', Validators.required],
     });
     this.invoiceForm = fb.group({
@@ -289,6 +290,7 @@ export class HomeComponent implements OnInit {
           {
             invoiceId: this.selectedInvoice.id,
             amount: this.billForm.value.amount,
+            number: this.billForm.value.number ?? null,
             paymentDate: this.normalizeDate(this.billForm.value.paymentDate),
           },
           8080
@@ -346,8 +348,8 @@ export class HomeComponent implements OnInit {
     const itemForm = this.fb.group({
       itemId: ['', Validators.required],
       itemDescription: [''],
-      quantity: [0, Validators.required],
-      price: [0, Validators.required],
+      quantity: [null, Validators.required],
+      price: [null, Validators.required],
       total: [{ value: 0, disabled: true }], // Read-only field
     });
 
