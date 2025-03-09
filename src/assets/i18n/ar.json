@@ -48,5 +48,6 @@
   "Invoice": "فاتورة",
   "Add Item To Invoice": "إضافة أعمال إلى الفاتورة",
   "Start Data": "تاريخ البدء",
-  "End Data": "تاريخ الانتهاء"
+  "End Data": "تاريخ الانتهاء",
+  "Cheque Number": "رقم الشيك"
 }

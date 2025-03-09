@@ -1,3 +1,31 @@
 .color-Red {
   color: red;
 }
+
+.supplier-caption {
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+  text-align: left;
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.supplier-scroll {
+  display: flex;
+  gap: 10px;
+  width: max-content;
+  padding: 5px;
+}
+
+.supplier-item {
+  padding: 5px 10px;
+  background: #f1f1f1;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.supplier-item:hover {
+  background: #ddd;
+}

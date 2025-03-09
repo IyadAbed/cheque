@@ -1,6 +1,6 @@
 <div class="grid">
   <div class="col-12 lg:col-6 xl:col-3">
-    <div class="card mb-0" (click)="invoiceDialog = true">
+    <div class="card mb-0" (click)="addNewInvoice()">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Add Invoice</span> -->
@@ -128,6 +128,15 @@
                 icon="pi pi-refresh"
                 (click)="reload()"
               ></button>
+            </div>
+            <div class="supplier-scroll">
+              <span
+                *ngFor="let supplier of allSuppliers"
+                class="supplier-item"
+                (click)="getAllInvoices(supplier.id)"
+              >
+                {{ supplier?.name }}
+              </span>
             </div>
             <div class="flex gap-2">
               <button
@@ -282,13 +291,13 @@
                   class="p-button-rounded p-button-success mr-2"
                   (click)="payModal(product)"
                 ></button>
-                <!-- <button
+                <button
                   pButton
                   pRipple
                   icon="pi pi-pencil"
                   class="p-button-rounded p-button-success mr-2"
                   (click)="editProduct(product)"
-                ></button> -->
+                ></button>
                 <button
                   pButton
                   pRipple
@@ -541,7 +550,9 @@
     <p-dialog
       [(visible)]="invoiceDialog"
       [style]="{ width: '800px', height: '90%' }"
-      header="{{ 'Add New Invoice' | translate }}"
+      header="{{
+        (!updateInvoice ? 'Add New Invoice' : 'Update Invoice') | translate
+      }}"
       [modal]="true"
       class="p-fluid"
       [formGroup]="invoiceForm"
@@ -751,19 +762,121 @@
             <p-table
               [value]="invoicePayment"
               [tableStyle]="{ 'min-width': '100%' }"
+              editMode="row"
+              dataKey="id"
             >
               <ng-template pTemplate="header">
                 <tr>
                   <th translate>Date</th>
                   <th translate>Paid Value</th>
+                  <th translate>Cheque Number</th>
+                  <th></th>
                 </tr>
               </ng-template>
-              <ng-template pTemplate="body" let-product>
+              <ng-template
+                pTemplate="body"
+                let-product
+                let-editing="editing"
+                let-ri="rowIndex"
+              >
+                <tr [pEditableRow]="product">
+                  <!-- Editable Date Column -->
+                  <td
+                    [pEditableColumn]="product.paymentDate"
+                    pEditableColumnField="paymentDate"
+                  >
+                    <p-cellEditor>
+                      <ng-template pTemplate="input">
+                        <input
+                          type="date"
+                          [(ngModel)]="product.paymentDate"
+                          class="p-inputtext p-column-filter"
+                        />
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        {{ product?.paymentDate | date : "dd/MM/yyyy" }}
+                      </ng-template>
+                    </p-cellEditor>
+                  </td>
+
+                  <!-- Editable Amount Column -->
+                  <td
+                    [pEditableColumn]="product.amount"
+                    pEditableColumnField="amount"
+                  >
+                    <p-cellEditor>
+                      <ng-template pTemplate="input">
+                        <p-inputNumber
+                          [(ngModel)]="product.amount"
+                          mode="currency"
+                          currency="AED"
+                          locale="en-US"
+                        >
+                        </p-inputNumber>
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        {{ product?.amount | currency : "AED" }}
+                      </ng-template>
+                    </p-cellEditor>
+                  </td>
+                  <td
+                    [pEditableColumn]="product.number"
+                    pEditableColumnField="number"
+                  >
+                    <p-cellEditor>
+                      <ng-template pTemplate="input">
+                        <p-inputNumber [(ngModel)]="product.number">
+                        </p-inputNumber>
+                      </ng-template>
+                      <ng-template pTemplate="output">
+                        {{ product?.number }}
+                      </ng-template>
+                    </p-cellEditor>
+                  </td>
+                  <td>
+                    <div
+                      class="flex align-items-center justify-content-center gap-2"
+                    >
+                      <button
+                        *ngIf="!editing"
+                        pButton
+                        pRipple
+                        type="button"
+                        pInitEditableRow
+                        icon="pi pi-pencil"
+                        (click)="onRowEditInit(product)"
+                        class="p-button-rounded p-button-text"
+                      ></button>
+                      <button
+                        *ngIf="editing"
+                        pButton
+                        pRipple
+                        type="button"
+                        pSaveEditableRow
+                        icon="pi pi-check"
+                        (click)="onRowEditSave(product)"
+                        class="p-button-rounded p-button-text p-button-success mr-2"
+                      ></button>
+                      <button
+                        *ngIf="editing"
+                        pButton
+                        pRipple
+                        type="button"
+                        pCancelEditableRow
+                        icon="pi pi-times"
+                        (click)="onRowEditCancel(product, ri)"
+                        class="p-button-rounded p-button-text p-button-danger"
+                      ></button>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+              <!-- <ng-template pTemplate="body" let-product>
                 <tr>
                   <td>{{ product?.paymentDate | date : "dd/MM/yyyy" }}</td>
                   <td>{{ product?.amount | currency : "AED" }}</td>
                 </tr>
-              </ng-template>
+              </ng-template> -->
             </p-table>
           </p-tabPanel>
         </p-tabView>

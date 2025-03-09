@@ -48,5 +48,6 @@
   "Invoice": "Invoice",
   "Add Item To Invoice": "Add Item To Invoice",
   "Start Data": "Start Data",
-  "End Data": "End Data"
+  "End Data": "End Data",
+  "Cheque Number": "Cheque Number"
 }

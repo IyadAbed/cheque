@@ -5,15 +5,30 @@ import { MessageService } from 'primeng/api';
 import { DatePipe } from '@angular/common';
 import { InvoiceService } from '../invoice.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
-import { Table } from 'primeng/table';
-import { Subscription } from 'rxjs';
+import {
+  CancelEditableRow,
+  EditableColumn,
+  EditableRow,
+  InitEditableRow,
+  SaveEditableRow,
+  Table,
+} from 'primeng/table';
+import { Observable, Subscription } from 'rxjs';
 import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  providers: [MessageService, DatePipe],
+  providers: [
+    MessageService,
+    DatePipe,
+    EditableRow,
+    InitEditableRow,
+    SaveEditableRow,
+    EditableColumn,
+    CancelEditableRow,
+  ],
 })
 export class HomeComponent implements OnInit {
   supplierDialog: boolean = false;
@@ -24,6 +39,14 @@ export class HomeComponent implements OnInit {
   paymentDialog: boolean = false;
   searchDialog: boolean = false;
   deleteProductDialog: boolean = false;
+  updateInvoice: boolean = false;
+
+  clonedProducts: { [s: string]: Payment } = {};
+
+  pageSize = 10;
+  currentPage = 1;
+  totalRecords = 0;
+
   allSuppliers: Supplier[] = [];
   allItem: Item[] = [];
   allProjects: Project[] = [];
@@ -122,6 +145,39 @@ export class HomeComponent implements OnInit {
     this.invoiceForm.get('taxable')?.valueChanges.subscribe(() => {
       this.calculateInvoiceTotal();
     });
+  }
+
+  onRowEditInit(product: Payment) {
+    this.clonedProducts[product.id as string] = { ...product };
+  }
+
+  onRowEditSave(product: Payment) {
+    console.log(product);
+
+    this.https
+      .sendPutRequest(
+        `payments/${product.id}`,
+        {
+          amount: product.amount,
+          paymentDate: product.paymentDate,
+          number: product.number,
+        },
+        8080
+      )
+      .subscribe(
+        (response) => {
+          console.log('Update successful', response);
+          this.getAllInvoices();
+        },
+        (error) => {
+          console.error('Error updating payment:', error);
+        }
+      );
+  }
+
+  onRowEditCancel(product: Payment, index: number) {
+    this.invoicePayment[index] = this.clonedProducts[product.id as string];
+    delete this.clonedProducts[product.id as string];
   }
 
   normalizeDate(date: any): string | null {
@@ -304,29 +360,65 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  addNewInvoice() {
+    this.invoiceDialog = true;
+    this.selectedInvoice = null;
+    this.updateInvoice = false;
+    this.items.clear();
+    this.invoiceForm.reset();
+  }
+
   openDetails(invoice: InvoiceRes) {
     this.selectedInvoice = invoice;
-    this.https
-      .sendGetRequest<any, InvoiceItem[]>(`invoices/items/${invoice.id}`, 8080)
-      .subscribe((res) => {
-        console.log('res', res);
-        this.invoiceItem = res;
-        this.itemDetailsDialog = true;
-      });
+    this.getInvoicesItems(invoice).subscribe((res) => {
+      console.log('res', res);
+      this.invoiceItem = res;
+      this.itemDetailsDialog = true;
+    });
+    this.getAllPayments(invoice);
+  }
+
+  getInvoicesItems(invoice: InvoiceRes): Observable<InvoiceItem[]> {
+    return this.https.sendGetRequest<any, InvoiceItem[]>(
+      `invoices/items/${invoice.id}`,
+      8080
+    );
+  }
+
+  getAllPayments(invoice: InvoiceRes) {
     this.https
       .sendGetRequest<any, Payment[]>(`payments/invoice/${invoice.id}`, 8080)
       .subscribe((res) => {
-        console.log('res Payment', res);
         this.invoicePayment = res;
       });
   }
 
-  getAllInvoices() {
+  getAllInvoices(supplierId?: string) {
     this.https
-      .sendPostRequest<InvoiceReq, InvoiceRes[]>('invoices/search', {}, 8080)
+      .sendPostRequest<InvoiceReq, InvoiceRes[]>(
+        'invoices/search',
+        { supplierId: supplierId ?? null },
+        8080
+      )
       .subscribe((res) => {
         this.products = res;
       });
+  }
+
+  updatePayment(event: any) {
+    const editedRow = event.data; // Get updated row data
+    const field = event.field; // Get the edited column (amount or paymentDate)
+    const newValue = editedRow[field]; // Get new value
+    console.log('====================================');
+    console.log('event event', event);
+    console.log('====================================');
+    // Prepare API request body
+    const updatedPayment = {
+      amount: editedRow.amount,
+      paymentDate: editedRow.paymentDate,
+    };
+
+    // Send PUT request to update the backend
   }
 
   get items(): FormArray {
@@ -438,7 +530,6 @@ export class HomeComponent implements OnInit {
     console.log(type);
 
     if (type === 'supplier') {
-      console.log('1', type);
       if (event.key === 'Tab' && this.filteredSuppliers.length > 0) {
         const firstSuggestion = this.filteredSuppliers[0];
         console.log('====================================');
@@ -462,6 +553,51 @@ export class HomeComponent implements OnInit {
         event.preventDefault();
       }
     }
+  }
+
+  editProduct(product: InvoiceRes) {
+    this.selectedInvoice = { ...product };
+    this.updateInvoice = true;
+    const invoiceDate = new Date(product.invoiceDate);
+    const taxable = this.taxableOpt.find(
+      (tax) => tax.value === product.taxable
+    );
+    const supplierId = this.allSuppliers.find(
+      (supp) => supp.id === product.supplierId
+    ).name;
+    const projectId = this.allProjects.find(
+      (proj) => proj.id === product.projectId
+    ).name;
+
+    this.invoiceForm.patchValue({
+      supplierId,
+      projectId,
+      number: this.selectedInvoice.number,
+      invoiceDate,
+      taxable,
+    });
+
+    this.items.clear();
+    this.getInvoicesItems(product).subscribe((res) => {
+      res.forEach((item) => {
+        const itemForm = this.fb.group({
+          itemId: item.item.name,
+          itemDescription: item.itemDescription,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.total,
+        });
+
+        itemForm.valueChanges.subscribe(() => {
+          this.updateItemTotal(itemForm);
+        });
+
+        this.items.push(itemForm);
+      });
+    });
+
+    this.invoiceDialog = true;
+    // this.UpdateChequeDialog = true;
   }
 
   addInvoice() {
@@ -489,11 +625,29 @@ export class HomeComponent implements OnInit {
         taxable: true,
       };
 
-      this.https.sendPostRequest('invoices', body, 8080).subscribe(() => {
-        this.invoiceDialog = false;
-        this.invoiceForm.reset();
-        this.getAllInvoices();
-      });
+      if (this.updateInvoice) {
+        this.https
+          .sendPutRequest(
+            'invoices/' + this.selectedInvoice?.id,
+            body,
+            8080,
+            'v1'
+          )
+          .subscribe(() => {
+            this.invoiceDialog = false;
+            this.updateInvoice = false;
+            this.items.clear();
+            this.invoiceForm.reset();
+            this.getAllInvoices();
+          });
+      } else {
+        this.https.sendPostRequest('invoices', body, 8080).subscribe(() => {
+          this.invoiceDialog = false;
+          this.items.clear();
+          this.invoiceForm.reset();
+          this.getAllInvoices();
+        });
+      }
     } else {
       this.invoiceForm.markAllAsTouched();
     }
@@ -630,6 +784,7 @@ interface Payment {
   id: string;
   invoiceId: string;
   amount: number;
+  number: number;
   paymentDate: string; // Date string in YYYY-MM-DD format
   status: 'ACTIVE' | string; // Update this union if there are more possible statuses
   createdAt: string | null; // ISO date string
