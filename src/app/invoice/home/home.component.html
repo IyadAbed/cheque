@@ -128,14 +128,33 @@
                 icon="pi pi-refresh"
                 (click)="reload()"
               ></button>
+              <p-dropdown
+                [options]="allSuppliers"
+                styleClass="w-20rem"
+                optionValue="id"
+                optionLabel="name"
+                [filter]="true"
+                filterBy="name"
+                (onChange)="getBySupplier()"
+                [(ngModel)]="selectedSupplier"
+                placeholder="Select Supplier"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="38"
+                [virtualScrollOptions]="options"
+              />
             </div>
             <div class="supplier-scroll">
-              <span
+              <!-- <p-splitButton
                 *ngFor="let supplier of allSuppliers"
-                class="supplier-item"
+                [label]="supplier?.name"
+                [model]="supplierItems"
                 (click)="getAllInvoices(supplier.id)"
-              >
-                {{ supplier?.name }}
+                raised
+                severity="info"
+              /> -->
+              <span *ngIf="selectedSupplier" class="supplier-item">
+                {{ getSupplierById(selectedSupplier) }}
+                <span (click)="deleteSupplierDialog = true">X</span>
               </span>
             </div>
             <div class="flex gap-2">
@@ -936,6 +955,44 @@
           class="p-button-text"
           label="{{ 'Yes' | translate }}"
           (click)="confirmDelete()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Delete Supplier -->
+    <!-- Delete Supplier -->
+    <!-- Delete Supplier -->
+
+    <p-dialog
+      [(visible)]="deleteSupplierDialog"
+      header="{{ 'Confirm' | translate }}"
+      [modal]="true"
+      [style]="{ width: '450px' }"
+    >
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="selectedSupplier"
+          >{{ "Are you sure you want to delete" | translate }}
+          <b>{{ getSupplierById(selectedSupplier) }}</b>
+          ?</span
+        >
+      </div>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          icon="pi pi-times"
+          class="p-button-text"
+          label="{{ 'No' | translate }}"
+          (click)="deleteSupplierDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          icon="pi pi-check"
+          class="p-button-text"
+          label="{{ 'Yes' | translate }}"
+          (click)="confirmDeleteSupplier()"
         ></button>
       </ng-template>
     </p-dialog>

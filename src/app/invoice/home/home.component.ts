@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpService } from '../../http.service';
-import { MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { DatePipe } from '@angular/common';
 import { InvoiceService } from '../invoice.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
@@ -39,9 +39,12 @@ export class HomeComponent implements OnInit {
   paymentDialog: boolean = false;
   searchDialog: boolean = false;
   deleteProductDialog: boolean = false;
+  deleteSupplierDialog: boolean = false;
   updateInvoice: boolean = false;
-
+  supplierItems: MenuItem[];
   clonedProducts: { [s: string]: Payment } = {};
+
+  selectedSupplier: any;
 
   pageSize = 10;
   currentPage = 1;
@@ -134,6 +137,14 @@ export class HomeComponent implements OnInit {
       taxable: [null],
       paymentStatus: [null],
     });
+    this.supplierItems = [
+      {
+        label: 'Delete',
+        command: () => {
+          this.removeSupplier;
+        },
+      },
+    ];
   }
 
   ngOnInit(): void {
@@ -290,6 +301,45 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  addNewProjectOnName(projectName: string) {
+    this.projectForm.markAllAsTouched();
+    if (projectName) {
+      this.projectDialog = false;
+      let body = { name: projectName };
+      // body = {
+      //   ...body,
+      //   dateOfPay: this.normalizeDate(this.projectForm.value.dateOfPay),
+      //   chequeType: this.projectForm.value.chequeType?.value,
+      //   isPayed: this.projectForm.value.isPayed?.value,
+      // };
+
+      this.https
+        .sendPostRequest('projects', body, 8080, false, 'v1')
+        .subscribe({
+          next: (res) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Successful',
+              detail: 'Cheque Added',
+              life: 3000,
+            });
+          },
+          complete: () => {
+            this.getAllProjects();
+            this.projectForm.reset();
+            // this.getAllCheque(10, this.sortDirection);
+          },
+        });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Something Went Wrong!',
+        life: 3000,
+      });
+    }
+  }
+
   addNewItem() {
     this.itemForm.markAllAsTouched();
     if (this.itemForm.valid) {
@@ -357,6 +407,22 @@ export class HomeComponent implements OnInit {
         });
     } else {
       this.billForm.markAllAsTouched();
+    }
+  }
+
+  getBySupplier() {
+    console.log('selectedSupplier', this.selectedSupplier);
+    if (this.selectedSupplier) {
+      this.getAllInvoices(this.selectedSupplier);
+    }
+  }
+
+  confirmDeleteSupplier() {
+    if (this.selectedSupplier) {
+      this.removeSupplier(this.selectedSupplier);
+      this.deleteSupplierDialog = false;
+      this.selectedSupplier = null;
+      this.getAllSuppliers();
     }
   }
 
@@ -484,6 +550,10 @@ export class HomeComponent implements OnInit {
     this.items.removeAt(index);
   }
 
+  removeSupplier(supplierId: string) {
+    this.https.sendDeleteRequest(`suppliers/${supplierId}`, 8080).subscribe();
+  }
+
   filterCountry(
     event: AutoCompleteCompleteEvent,
     type: 'supplier' | 'project' | 'item'
@@ -602,6 +672,15 @@ export class HomeComponent implements OnInit {
 
   addInvoice() {
     if (this.invoiceForm.valid) {
+      let selectedProject = this.allProjects.find(
+        (proj) => proj.name === this.invoiceForm.value.projectId
+      ).id;
+      if (!selectedProject) {
+        this.addNewProjectOnName(this.invoiceForm.value.projectId);
+        selectedProject = this.allProjects.find(
+          (proj) => proj.name === this.invoiceForm.value.projectId
+        ).id;
+      }
       const itemsData = this.items.controls.map((control, index) => ({
         itemId: this.allItem.find(
           (item) => item.name === control.get('itemId')?.value
@@ -615,9 +694,7 @@ export class HomeComponent implements OnInit {
         supplierId: this.allSuppliers.find(
           (supp) => supp.name === this.invoiceForm.value.supplierId
         ).id,
-        projectId: this.allProjects.find(
-          (proj) => proj.name === this.invoiceForm.value.projectId
-        ).id,
+        projectId: selectedProject,
         number: this.invoiceForm.value.number,
         invoiceDate: this.normalizeDate(this.invoiceForm.value.invoiceDate),
         amount: this.invoiceForm.value.amount,
@@ -636,6 +713,7 @@ export class HomeComponent implements OnInit {
           .subscribe(() => {
             this.invoiceDialog = false;
             this.updateInvoice = false;
+            this.selectedInvoice = null;
             this.items.clear();
             this.invoiceForm.reset();
             this.getAllInvoices();
@@ -679,6 +757,11 @@ export class HomeComponent implements OnInit {
 
   reload() {
     window.location.reload();
+  }
+
+  getSupplierById(id: string) {
+    const supplier = this.allSuppliers.find((sub) => sub.id == id);
+    return supplier.name ?? '';
   }
 
   onGlobalFilter(table: Table, event: Event) {
