@@ -32,6 +32,8 @@ import { TranslationService } from '../../core/services/translation.service';
 })
 export class HomeComponent implements OnInit {
   supplierDialog: boolean = false;
+  EditSupplierDialog: boolean = false;
+  isSubmitInvoice: boolean = false;
   projectDialog: boolean = false;
   itemDialog: boolean = false;
   invoiceDialog: boolean = false;
@@ -139,9 +141,24 @@ export class HomeComponent implements OnInit {
     });
     this.supplierItems = [
       {
-        label: 'Delete',
+        label: this.langSelected == 'en' ? 'Delete' : 'حذف',
         command: () => {
-          this.removeSupplier;
+          this.EditSupplierDialog = true;
+        },
+      },
+      {
+        label: this.langSelected == 'en' ? 'Update' : 'تعديل',
+        command: () => {
+          let suppSelected = this.allSuppliers.find(
+            (sup) => sup.id === this.selectedSupplier
+          );
+          if (suppSelected) {
+            this.supplierForm.patchValue({
+              name: suppSelected?.name,
+              trnNumber: suppSelected?.trnNumber ?? '',
+            });
+            this.EditSupplierDialog = true;
+          }
         },
       },
     ];
@@ -156,6 +173,11 @@ export class HomeComponent implements OnInit {
     this.invoiceForm.get('taxable')?.valueChanges.subscribe(() => {
       this.calculateInvoiceTotal();
     });
+  }
+
+  supplierModal() {
+    this.supplierForm.reset();
+    this.supplierDialog = true;
   }
 
   onRowEditInit(product: Payment) {
@@ -228,13 +250,6 @@ export class HomeComponent implements OnInit {
     if (this.supplierForm.valid) {
       this.supplierDialog = false;
       let body = this.supplierForm.value;
-      // body = {
-      //   ...body,
-      //   dateOfPay: this.normalizeDate(this.supplierForm.value.dateOfPay),
-      //   chequeType: this.supplierForm.value.chequeType?.value,
-      //   isPayed: this.supplierForm.value.isPayed?.value,
-      // };
-
       this.https
         .sendPostRequest('suppliers', body, 8080, false, 'v1')
         .subscribe({
@@ -437,7 +452,6 @@ export class HomeComponent implements OnInit {
   openDetails(invoice: InvoiceRes) {
     this.selectedInvoice = invoice;
     this.getInvoicesItems(invoice).subscribe((res) => {
-      console.log('res', res);
       this.invoiceItem = res;
       this.itemDetailsDialog = true;
     });
@@ -485,6 +499,37 @@ export class HomeComponent implements OnInit {
     };
 
     // Send PUT request to update the backend
+  }
+
+  updateSupplier() {
+    this.supplierForm.markAllAsTouched();
+    if (this.supplierForm.valid) {
+      this.EditSupplierDialog = false;
+      let body = this.supplierForm.value;
+      this.https
+        .sendPutRequest('suppliers/' + this.selectedSupplier, body, 8080)
+        .subscribe({
+          next: (res) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Successful',
+              detail: 'Supplier Added',
+              life: 3000,
+            });
+          },
+          complete: () => {
+            this.supplierForm.reset();
+            this.getAllSuppliers();
+          },
+        });
+    } else {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Something Went Wrong!',
+        life: 3000,
+      });
+    }
   }
 
   get items(): FormArray {
@@ -672,60 +717,64 @@ export class HomeComponent implements OnInit {
 
   addInvoice() {
     if (this.invoiceForm.valid) {
+      this.isSubmitInvoice = true;
       let selectedProject = this.allProjects.find(
         (proj) => proj.name === this.invoiceForm.value.projectId
-      ).id;
+      )?.id;
       if (!selectedProject) {
         this.addNewProjectOnName(this.invoiceForm.value.projectId);
+      }
+      setTimeout(() => {
         selectedProject = this.allProjects.find(
           (proj) => proj.name === this.invoiceForm.value.projectId
         ).id;
-      }
-      const itemsData = this.items.controls.map((control, index) => ({
-        itemId: this.allItem.find(
-          (item) => item.name === control.get('itemId')?.value
-        ).id,
-        itemDescription: control.get('itemDescription')?.value || null,
-        quantity: control.get('quantity')?.value || null,
-        price: control.get('price')?.value || null,
-        total: control.get('total')?.value,
-      }));
-      let body = {
-        supplierId: this.allSuppliers.find(
-          (supp) => supp.name === this.invoiceForm.value.supplierId
-        ).id,
-        projectId: selectedProject,
-        number: this.invoiceForm.value.number,
-        invoiceDate: this.normalizeDate(this.invoiceForm.value.invoiceDate),
-        amount: this.invoiceForm.value.amount,
-        items: itemsData,
-        taxable: true,
-      };
+        const itemsData = this.items.controls.map((control, index) => ({
+          itemId: this.allItem.find(
+            (item) => item.name === control.get('itemId')?.value
+          ).id,
+          itemDescription: control.get('itemDescription')?.value || null,
+          quantity: control.get('quantity')?.value || null,
+          price: control.get('price')?.value || null,
+          total: control.get('total')?.value,
+        }));
+        let body = {
+          supplierId: this.allSuppliers.find(
+            (supp) => supp.name === this.invoiceForm.value.supplierId
+          ).id,
+          projectId: selectedProject,
+          number: this.invoiceForm.value.number,
+          invoiceDate: this.normalizeDate(this.invoiceForm.value.invoiceDate),
+          amount: this.invoiceForm.value.amount,
+          items: itemsData,
+          taxable: true,
+        };
 
-      if (this.updateInvoice) {
-        this.https
-          .sendPutRequest(
-            'invoices/' + this.selectedInvoice?.id,
-            body,
-            8080,
-            'v1'
-          )
-          .subscribe(() => {
+        if (this.updateInvoice) {
+          this.https
+            .sendPutRequest(
+              'invoices/' + this.selectedInvoice?.id,
+              body,
+              8080,
+              'v1'
+            )
+            .subscribe(() => {
+              this.invoiceDialog = false;
+              this.updateInvoice = false;
+              this.selectedInvoice = null;
+              this.items.clear();
+              this.invoiceForm.reset();
+              this.getAllInvoices();
+            });
+        } else {
+          this.https.sendPostRequest('invoices', body, 8080).subscribe(() => {
             this.invoiceDialog = false;
-            this.updateInvoice = false;
-            this.selectedInvoice = null;
             this.items.clear();
             this.invoiceForm.reset();
             this.getAllInvoices();
           });
-      } else {
-        this.https.sendPostRequest('invoices', body, 8080).subscribe(() => {
-          this.invoiceDialog = false;
-          this.items.clear();
-          this.invoiceForm.reset();
-          this.getAllInvoices();
-        });
-      }
+        }
+        this.isSubmitInvoice = false;
+      }, 1500);
     } else {
       this.invoiceForm.markAllAsTouched();
     }
@@ -736,6 +785,19 @@ export class HomeComponent implements OnInit {
       this.selectedInvoice = invoice;
       this.deleteProductDialog = true;
     }
+  }
+
+  deletePayment(payment: Payment) {
+    this.https
+      .sendDeleteRequest(`payments/${payment.id}`, 8080)
+      .subscribe(() => {
+        let indexToDelete = this.invoicePayment.findIndex(
+          (payments) => payments.id == payment.id
+        );
+        if (indexToDelete != -1) {
+          this.invoicePayment.splice(indexToDelete, 1);
+        }
+      });
   }
 
   confirmDelete() {

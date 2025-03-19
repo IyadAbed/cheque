@@ -18,7 +18,7 @@
     </div>
   </div>
   <div class="col-12 lg:col-6 xl:col-3">
-    <div class="card mb-0" (click)="this.supplierDialog = true">
+    <div class="card mb-0" (click)="supplierModal()">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Orders</span> -->
@@ -152,9 +152,13 @@
                 raised
                 severity="info"
               /> -->
-              <span *ngIf="selectedSupplier" class="supplier-item">
-                {{ getSupplierById(selectedSupplier) }}
-                <span (click)="deleteSupplierDialog = true">X</span>
+              <span *ngIf="selectedSupplier">
+                <p-splitButton
+                  label="{{ getSupplierById(selectedSupplier) }}"
+                  [model]="supplierItems"
+                />
+
+                <!-- <span (click)="deleteSupplierDialog = true">X</span> -->
               </span>
             </div>
             <div class="flex gap-2">
@@ -276,7 +280,7 @@
                 {{
                   product.paidAmount
                     ? (product.amount - product.paidAmount | currency : "AED")
-                    : "-"
+                    : (product.amount | currency : "AED")
                 }}
               </span>
             </td>
@@ -414,6 +418,51 @@
           icon="pi pi-check"
           class="p-button-text"
           (click)="addNewSupplier()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Edit Supplier -->
+    <!-- Edit Supplier -->
+    <!-- Edit Supplier -->
+    <p-dialog
+      [(visible)]="EditSupplierDialog"
+      [style]="{ width: '600px', height: '320px' }"
+      header="{{ 'Update Supplier' | translate }}"
+      [modal]="true"
+      class="p-fluid"
+      [formGroup]="supplierForm"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <div class="field">
+          <label htmlFor="name" translate>Supplier Name</label>
+          <input pInputText formControlName="name" type="text" />
+        </div>
+        <div class="field">
+          <label htmlFor="name" translate>TRN Number</label>
+          <input pInputText formControlName="trnNumber" type="text" />
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="{{ 'Cancel' | translate }}"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="this.supplierDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="{{ 'Save' | translate }}"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="updateSupplier()"
         ></button>
       </ng-template>
     </p-dialog>
@@ -730,6 +779,7 @@
         <button
           pButton
           pRipple
+          [disabled]="isSubmitInvoice"
           label="{{ 'Save' | translate }}"
           icon="pi pi-check"
           class="p-button-text"
@@ -864,6 +914,16 @@
                         pInitEditableRow
                         icon="pi pi-pencil"
                         (click)="onRowEditInit(product)"
+                        class="p-button-rounded p-button-text"
+                      ></button>
+                      <button
+                        *ngIf="!editing"
+                        pButton
+                        pRipple
+                        type="button"
+                        pInitEditableRow
+                        icon="pi pi-trash"
+                        (click)="deletePayment(product)"
                         class="p-button-rounded p-button-text"
                       ></button>
                       <button
