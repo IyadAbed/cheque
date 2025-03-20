@@ -80,6 +80,10 @@ export class HomeComponent implements OnInit {
     { label: 'Non Taxable', value: false },
   ];
 
+  totalAmount: number = 0;
+  totalPaidAmount: number = 0;
+  totalRemaining: number = 0;
+
   langSubscription: Subscription;
 
   constructor(
@@ -482,6 +486,16 @@ export class HomeComponent implements OnInit {
       )
       .subscribe((res) => {
         this.products = res;
+
+        this.totalAmount = this.products.reduce(
+          (sum, item) => sum + item.amount,
+          0
+        );
+        this.totalPaidAmount = this.products.reduce(
+          (sum, item) => sum + (item.paidAmount || 0),
+          0
+        );
+        this.totalRemaining = this.totalAmount - this.totalPaidAmount;
       });
   }
 
@@ -856,6 +870,15 @@ export class HomeComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.products = res;
+          this.totalAmount = this.products.reduce(
+            (sum, item) => sum + item.amount,
+            0
+          );
+          this.totalPaidAmount = this.products.reduce(
+            (sum, item) => sum + (item.paidAmount || 0),
+            0
+          );
+          this.totalRemaining = this.totalAmount - this.totalPaidAmount;
           this.searchForm.reset();
           this.searchDialog = false;
         },
