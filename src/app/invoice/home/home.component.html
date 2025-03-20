@@ -659,6 +659,8 @@
                 id="amount"
                 formControlName="quantity"
                 locale="en-US"
+                [minFractionDigits]="0" 
+                [maxFractionDigits]="2" 
                 required
               ></p-inputNumber>
             </div>

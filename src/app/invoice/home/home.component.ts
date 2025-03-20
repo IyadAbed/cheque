@@ -46,6 +46,8 @@ export class HomeComponent implements OnInit {
   supplierItems: MenuItem[];
   clonedProducts: { [s: string]: Payment } = {};
 
+  isSearch: boolean = false;
+
   selectedSupplier: any;
 
   pageSize = 10;
@@ -478,6 +480,7 @@ export class HomeComponent implements OnInit {
   }
 
   getAllInvoices(supplierId?: string) {
+    this.isSearch = false;
     this.https
       .sendPostRequest<InvoiceReq, InvoiceRes[]>(
         'invoices/search',
@@ -485,8 +488,13 @@ export class HomeComponent implements OnInit {
         8080
       )
       .subscribe((res) => {
-        this.products = res;
-
+        this.products = res
+          .filter((invoice) => invoice.amount !== invoice.paidAmount) // Exclude paid invoices
+          .sort(
+            (a, b) =>
+              new Date(b.invoiceDate).getTime() -
+              new Date(a.invoiceDate).getTime()
+          );
         this.totalAmount = this.products.reduce(
           (sum, item) => sum + item.amount,
           0
@@ -845,6 +853,7 @@ export class HomeComponent implements OnInit {
   }
 
   AdvanceSearch() {
+    this.isSearch = true;
     console.log('Form Search', this.searchForm.value);
     let body = this.searchForm.value;
     // supplierId
@@ -869,7 +878,11 @@ export class HomeComponent implements OnInit {
       )
       .subscribe({
         next: (res) => {
-          this.products = res;
+          this.products = res.sort(
+            (a, b) =>
+              new Date(b.invoiceDate).getTime() -
+              new Date(a.invoiceDate).getTime()
+          );
           this.totalAmount = this.products.reduce(
             (sum, item) => sum + item.amount,
             0
