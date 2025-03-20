@@ -144,6 +144,7 @@ export class HomeComponent implements OnInit {
       endDate: [null],
       taxable: [null],
       paymentStatus: [null],
+      itemIds: [null],
     });
     this.supplierItems = [
       {

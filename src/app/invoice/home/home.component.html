@@ -659,8 +659,8 @@
                 id="amount"
                 formControlName="quantity"
                 locale="en-US"
-                [minFractionDigits]="0" 
-                [maxFractionDigits]="2" 
+                [minFractionDigits]="0"
+                [maxFractionDigits]="2"
                 required
               ></p-inputNumber>
             </div>
@@ -1083,6 +1083,18 @@
               [useGrouping]="false"
               required
             ></p-inputNumber>
+          </div>
+        </div>
+
+        <div class="formgrid grid">
+          <div class="field col">
+            <label for="price" translate>Item</label>
+            <p-multiSelect
+              [options]="allItem"
+              formControlName="itemIds"
+              optionLabel="name"
+              optionValue="id"
+            />
           </div>
         </div>
 
