@@ -4,6 +4,7 @@ import { LayoutService } from '../service/layout.service';
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
+  standalone: false,
 })
 export class MenuComponent implements OnInit {
   model: any[] = [];

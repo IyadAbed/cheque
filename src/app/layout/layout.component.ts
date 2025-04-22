@@ -8,6 +8,7 @@ import { TopbarComponent } from './topbar/topbar.component';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
+  standalone: false,
 })
 export class LayoutComponent {
   overlayMenuOpenSubscription: Subscription;

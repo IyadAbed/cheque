@@ -116,6 +116,7 @@ import { MenuService } from '../menu.service';
       ),
     ]),
   ],
+  standalone: false,
 })
 export class MenuitemComponent implements OnInit, OnDestroy {
   @Input() item: any;

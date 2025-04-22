@@ -15,6 +15,7 @@ import {
 } from 'primeng/table';
 import { Observable, Subscription } from 'rxjs';
 import { TranslationService } from '../../core/services/translation.service';
+import { Toastr } from '../../core/services/toastrService';
 
 @Component({
   selector: 'app-home',
@@ -29,6 +30,7 @@ import { TranslationService } from '../../core/services/translation.service';
     EditableColumn,
     CancelEditableRow,
   ],
+  standalone: false,
 })
 export class HomeComponent implements OnInit {
   supplierDialog: boolean = false;
@@ -42,6 +44,9 @@ export class HomeComponent implements OnInit {
   searchDialog: boolean = false;
   deleteProductDialog: boolean = false;
   deleteSupplierDialog: boolean = false;
+  itemUpdateDialog: boolean = false;
+  supplierUpdateDialog: boolean = false;
+  projectUpdateDialog: boolean = false;
   updateInvoice: boolean = false;
   supplierItems: MenuItem[];
   clonedProducts: { [s: string]: Payment } = {};
@@ -88,13 +93,18 @@ export class HomeComponent implements OnInit {
 
   langSubscription: Subscription;
 
+  // Bashar
+
+  allProjectsToUpdate: Project[] = [];
+  allItemsToUpdate: Item[] = [];
+
   constructor(
     private fb: FormBuilder,
     private https: HttpService,
     private messageService: MessageService,
-    private datePipe: DatePipe,
     private translationService: TranslationService,
-    private invoiceService: InvoiceService
+    private invoiceService: InvoiceService,
+    private Toastr: Toastr
   ) {
     this.langSubscription = this.translationService
       .getLangSubject()
@@ -898,12 +908,126 @@ export class HomeComponent implements OnInit {
         },
       });
   }
+
+  // get projects and delete and update its work   bashar
+
+  openProjectDialog() {
+    this.projectUpdateDialog = true;
+    this.getProjects();
+  }
+
+  getProjects() {
+    this.https
+      .sendGetRequest<any, Project[]>(`projects`, 8080)
+      .subscribe((res) => {
+        console.log('res', res);
+        this.allProjectsToUpdate = res;
+        // this.allProjects = res;
+      });
+  }
+
+  deleteProject(project: Project) {
+    this.https
+      .sendDeleteRequest(`projects/${project.id}`, 8080)
+      .subscribe(() => {
+        this.Toastr.showSuccess(
+          this.langSelected == 'en' ? 'Project Deleted' : 'تم حذف المشروع'
+        );
+        this.getProjects();
+      });
+  }
+
+  editProject(project: Project) {
+    console.log('project', project);
+    const data = {
+      name: project.name,
+    };
+    this.https
+      .sendPutRequest(`projects/${project.id}`, data, 8080)
+      .subscribe(() => {
+        console.log('Project updated successfully');
+        this.Toastr.showSuccess(
+          this.langSelected == 'en' ? 'Project Updated' : 'تم تعديل المشروع'
+        );
+        this.getProjects();
+      });
+  }
+
+  // get Item and delete and update item bashar
+
+  openUpdateDailogitem() {
+    this.itemUpdateDialog = true;
+    this.getItems();
+  }
+
+  getItems() {
+    this.https.sendGetRequest<any, Item[]>(`items`, 8080).subscribe((res) => {
+      console.log('res', res);
+      this.allItemsToUpdate = res;
+    });
+  }
+
+  deleteItem(item: Item) {
+    this.https.sendDeleteRequest(`items/${item.id}`, 8080).subscribe(() => {
+      this.Toastr.showSuccess(
+        this.langSelected == 'en' ? 'Item Deleted' : 'تم حذف العنصر'
+      );
+      this.getItems();
+    });
+  }
+
+  updateItem(item: Item) {
+    console.log('item', item);
+
+    const data = {
+      name: item.name,
+      description: item.description,
+    };
+    this.https.sendPutRequest(`items/${item.id}`, data, 8080).subscribe(() => {
+      console.log('Item updated successfully');
+      this.Toastr.showSuccess(
+        this.langSelected == 'en' ? 'Item Updated' : 'تم تعديل العنصر'
+      );
+    });
+  }
+
+  // edit and delete supplier bashar
+  deleteSupplier(supplier: Supplier) {
+    this.https
+      .sendDeleteRequest(`suppliers/${supplier.id}`, 8080)
+      .subscribe(() => {
+        this.Toastr.showSuccess(
+          this.langSelected == 'en' ? 'Supplier Deleted' : 'تم حذف المورد'
+        );
+        this.getAllSuppliers();
+      });
+  }
+
+  updateSupplierDetails(supplier: Supplier) {
+    console.log('supplier', supplier);
+
+    const body = {
+      name: supplier.name,
+      trnNumber: supplier.trnNumber,
+    };
+
+    this.https
+      .sendPutRequest(`suppliers/${supplier.id}`, body, 8080)
+      .subscribe(() => {
+        console.log('Supplier updated successfully');
+        this.Toastr.showSuccess(
+          this.langSelected == 'en' ? 'Supplier Updated' : 'تم تعديل المورد'
+        );
+        this.getAllSuppliers();
+      });
+  }
 }
 
 export interface Supplier {
   id: string;
   name: string;
   trnNumber: string;
+  description: string;
   status: string;
   createdAt: string;
 }

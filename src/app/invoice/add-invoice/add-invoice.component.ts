@@ -10,6 +10,7 @@ import { HttpService } from '../../http.service';
   selector: 'app-add-invoice',
   templateUrl: './add-invoice.component.html',
   styleUrl: './add-invoice.component.scss',
+  standalone: false,
 })
 export class AddInvoiceComponent {
   allSuppliers: Supplier[] = [];

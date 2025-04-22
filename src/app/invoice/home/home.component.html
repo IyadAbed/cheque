@@ -18,17 +18,27 @@
     </div>
   </div>
   <div class="col-12 lg:col-6 xl:col-3">
-    <div class="card mb-0" (click)="supplierModal()">
+    <div class="card mb-0">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Orders</span> -->
           <div class="text-900 font-medium text-xl" translate>Add Supplier</div>
         </div>
-        <div
-          class="flex align-items-center justify-content-center bg-teal-200 border-round"
-          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
-        >
-          <i class="pi pi-user-plus text-blue-700 text-xl"></i>
+        <div class="flex justify-content-center align-items-center gap-2">
+          <div
+            class="flex align-items-center justify-content-center cursor-pointer bg-teal-200 border-round"
+            [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+            (click)="supplierModal()"
+          >
+            <i class="pi pi-user-plus text-blue-700 text-xl"></i>
+          </div>
+          <div
+            class="flex align-items-center justify-content-center cursor-pointer bg-teal-200 border-round"
+            [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+            (click)="supplierUpdateDialog = true"
+          >
+            <i class="pi pi-pencil text-blue-700 text-xl"></i>
+          </div>
         </div>
       </div>
       <!-- <span class="text-green-500 font-medium">24 new </span>
@@ -36,17 +46,27 @@
     </div>
   </div>
   <div class="col-12 lg:col-6 xl:col-3">
-    <div class="card mb-0" (click)="this.projectDialog = true">
+    <div class="card mb-0">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Revenue</span> -->
           <div class="text-900 font-medium text-xl" translate>Add Project</div>
         </div>
-        <div
-          class="flex align-items-center justify-content-center bg-orange-100 border-round"
-          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
-        >
-          <i class="pi pi-ticket text-orange-500 text-xl"></i>
+        <div class="flex justify-content-center align-items-center gap-2">
+          <div
+            class="flex align-items-center justify-content-center cursor-pointer bg-teal-200 border-round"
+            [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+            (click)="this.projectDialog = true"
+          >
+            <i class="pi pi-ticket text-orange-500 text-xl"></i>
+          </div>
+          <div
+            class="flex align-items-center justify-content-center cursor-pointer bg-teal-200 border-round"
+            [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+            (click)="openProjectDialog()"
+          >
+            <i class="pi pi-pencil text-orange-500 text-xl"></i>
+          </div>
         </div>
       </div>
       <!-- <span class="text-green-500 font-medium">%52+ </span>
@@ -54,17 +74,27 @@
     </div>
   </div>
   <div class="col-12 lg:col-6 xl:col-3">
-    <div class="card mb-0" (click)="this.itemDialog = true">
+    <div class="card mb-0">
       <div class="flex justify-content-between align-items-center mb-3">
         <div>
           <!-- <span class="block text-500 font-medium mb-3">Add Item</span> -->
           <div class="text-900 font-medium text-xl" translate>Add Item</div>
         </div>
-        <div
-          class="flex align-items-center justify-content-center bg-cyan-100 border-round"
-          [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
-        >
-          <i class="pi pi-plus text-cyan-500 text-xl"></i>
+        <div class="flex justify-content-center align-items-center gap-2">
+          <div
+            class="flex align-items-center justify-content-center cursor-pointer bg-cyan-100 border-round"
+            [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+            (click)="this.itemDialog = true"
+          >
+            <i class="pi pi-plus text-cyan-500 text-xl"></i>
+          </div>
+          <div
+            class="flex align-items-center justify-content-center cursor-pointer bg-cyan-100 border-round"
+            [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+            (click)="openUpdateDailogitem()"
+          >
+            <i class="pi pi-pencil text-cyan-500 text-xl"></i>
+          </div>
         </div>
       </div>
       <!-- <span class="text-green-500 font-medium">520 </span>
@@ -1153,6 +1183,462 @@
             ></button>
           </div>
         </div>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Update Item 2 -->
+    <!-- Update Item -->
+    <!-- Update Item -->
+    <!-- update and delete its work   -->
+    <p-dialog
+      [(visible)]="itemUpdateDialog"
+      [style]="{ width: '50%', height: '70%' }"
+      header="{{ 'Show Details' | translate }}"
+      [modal]="true"
+      class="p-fluid"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <p-table
+          [value]="allItemsToUpdate"
+          [tableStyle]="{ 'min-width': '100%' }"
+          editMode="row"
+          dataKey="id"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th translate>Name</th>
+              <th translate>Description</th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template
+            pTemplate="body"
+            let-product
+            let-editing="editing"
+            let-ri="rowIndex"
+          >
+            <tr [pEditableRow]="product">
+              <!-- Editable Date Column -->
+              <td [pEditableColumn]="product.name" pEditableColumnField="name">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input
+                      pInputText
+                      [(ngModel)]="product.name"
+                      class="p-inputtext p-column-filter"
+                      type="text"
+                    />
+                    <!-- <input
+                      type="date"
+                      [(ngModel)]="product.paymentDate"
+                      class="p-inputtext p-column-filter"
+                    /> -->
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ product?.name }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+
+              <!-- Editable Amount Column -->
+              <td
+                [pEditableColumn]="product.description"
+                pEditableColumnField="amount"
+              >
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input
+                      pInputText
+                      [(ngModel)]="product.description"
+                      class="p-inputtext p-column-filter"
+                      type="text"
+                    />
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ product?.description }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+              <td>
+                <div
+                  class="flex align-items-center justify-content-center gap-2"
+                >
+                  <button
+                    *ngIf="!editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pInitEditableRow
+                    icon="pi pi-pencil"
+                    (click)="onRowEditInit(product)"
+                    class="p-button-rounded p-button-text"
+                  ></button>
+                  <button
+                    *ngIf="!editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pInitEditableRow
+                    icon="pi pi-trash"
+                    (click)="deleteItem(product)"
+                    class="p-button-rounded p-button-text"
+                  ></button>
+                  <button
+                    *ngIf="editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pSaveEditableRow
+                    icon="pi pi-check"
+                    (click)="updateItem(product)"
+                    class="p-button-rounded p-button-text p-button-success mr-2"
+                  ></button>
+                  <button
+                    *ngIf="editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pCancelEditableRow
+                    icon="pi pi-times"
+                    (click)="onRowEditCancel(product, ri)"
+                    class="p-button-rounded p-button-text p-button-danger"
+                  ></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <!-- <ng-template pTemplate="body" let-product>
+        <tr>
+          <td>{{ product?.paymentDate | date : "dd/MM/yyyy" }}</td>
+          <td>{{ product?.amount | currency : "AED" }}</td>
+        </tr>
+      </ng-template> -->
+        </p-table>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="{{ 'Cancel' | translate }}"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="itemUpdateDialog = false"
+        ></button>
+        <!-- <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="addInvoice()"
+        ></button> -->
+      </ng-template>
+    </p-dialog>
+
+    <!-- Update Project 1 -->
+    <!-- Update Project -->
+    <!-- Update Project and delete its work  -->
+    <p-dialog
+      [(visible)]="projectUpdateDialog"
+      [style]="{ width: '50%', height: '70%' }"
+      header="{{ 'Show Details' | translate }}"
+      [modal]="true"
+      class="p-fluid"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <p-table
+          [value]="allProjectsToUpdate"
+          [tableStyle]="{ 'min-width': '100%' }"
+          editMode="row"
+          dataKey="id"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th translate>Name</th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template
+            pTemplate="body"
+            let-product
+            let-editing="editing"
+            let-ri="rowIndex"
+          >
+            <tr [pEditableRow]="product">
+              <!-- Editable Date Column -->
+              <td [pEditableColumn]="product.name" pEditableColumnField="name">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input
+                      pInputText
+                      [(ngModel)]="product.name"
+                      class="p-inputtext p-column-filter"
+                      type="text"
+                    />
+                    <!-- <input
+                      type="date"
+                      [(ngModel)]="product.paymentDate"
+                      class="p-inputtext p-column-filter"
+                    /> -->
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ product?.name }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+
+              <!-- Editable Amount Column -->
+              <!-- <td
+                [pEditableColumn]="product.description"
+                pEditableColumnField="amount"
+              >
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input
+                      pInputText
+                      [(ngModel)]="product.description"
+                      class="p-inputtext p-column-filter"
+                      type="text"
+                    />
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ product?.description }}
+                  </ng-template>
+                </p-cellEditor>
+              </td> -->
+              <td>
+                <div
+                  class="flex align-items-center justify-content-center gap-2"
+                >
+                  <button
+                    *ngIf="!editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pInitEditableRow
+                    icon="pi pi-pencil"
+                    (click)="onRowEditInit(product)"
+                    class="p-button-rounded p-button-text"
+                  ></button>
+                  <button
+                    *ngIf="!editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pInitEditableRow
+                    icon="pi pi-trash"
+                    (click)="deleteProject(product)"
+                    class="p-button-rounded p-button-text"
+                  ></button>
+                  <button
+                    *ngIf="editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pSaveEditableRow
+                    icon="pi pi-check"
+                    (click)="editProject(product)"
+                    class="p-button-rounded p-button-text p-button-success mr-2"
+                  ></button>
+                  <button
+                    *ngIf="editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pCancelEditableRow
+                    icon="pi pi-times"
+                    (click)="onRowEditCancel(product, ri)"
+                    class="p-button-rounded p-button-text p-button-danger"
+                  ></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <!-- <ng-template pTemplate="body" let-product>
+        <tr>
+          <td>{{ product?.paymentDate | date : "dd/MM/yyyy" }}</td>
+          <td>{{ product?.amount | currency : "AED" }}</td>
+        </tr>
+      </ng-template> -->
+        </p-table>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="{{ 'Cancel' | translate }}"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="projectUpdateDialog = false"
+        ></button>
+        <!-- <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="addInvoice()"
+        ></button> -->
+      </ng-template>
+    </p-dialog>
+
+    <!-- Update Supplier 3 -->
+    <!-- Update Supplier -->
+    <!-- Update Supplier  update and delete its work-->
+    <p-dialog
+      [(visible)]="supplierUpdateDialog"
+      [style]="{ width: '50%', height: '70%' }"
+      header="{{ 'Show Details' | translate }}"
+      [modal]="true"
+      class="p-fluid"
+    >
+      <ng-template
+        pTemplate="content"
+        class="flex flex-column justify-content-md-end"
+      >
+        <p-table
+          [value]="allSuppliers"
+          [tableStyle]="{ 'min-width': '100%' }"
+          editMode="row"
+          dataKey="id"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th translate>Name</th>
+              <th translate>trnNumber</th>
+              <th></th>
+            </tr>
+          </ng-template>
+          <ng-template
+            pTemplate="body"
+            let-product
+            let-editing="editing"
+            let-ri="rowIndex"
+          >
+            <tr [pEditableRow]="product">
+              <!-- Editable Date Column -->
+              <td [pEditableColumn]="product.name" pEditableColumnField="name">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input
+                      pInputText
+                      [(ngModel)]="product.name"
+                      class="p-inputtext p-column-filter"
+                      type="text"
+                    />
+                    <!-- <input
+                      type="date"
+                      [(ngModel)]="product.paymentDate"
+                      class="p-inputtext p-column-filter"
+                    /> -->
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ product?.name }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+
+              <!-- Editable Amount Column -->
+              <td
+                [pEditableColumn]="product.trnNumber"
+                pEditableColumnField="amount"
+              >
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input
+                      pInputText
+                      [(ngModel)]="product.trnNumber"
+                      class="p-inputtext p-column-filter"
+                      type="text"
+                    />
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ product?.trnNumber }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+              <td>
+                <div
+                  class="flex align-items-center justify-content-center gap-2"
+                >
+                  <button
+                    *ngIf="!editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pInitEditableRow
+                    icon="pi pi-pencil"
+                    (click)="onRowEditInit(product)"
+                    class="p-button-rounded p-button-text"
+                  ></button>
+                  <button
+                    *ngIf="!editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pInitEditableRow
+                    icon="pi pi-trash"
+                    (click)="deleteSupplier(product)"
+                    class="p-button-rounded p-button-text"
+                  ></button>
+                  <button
+                    *ngIf="editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pSaveEditableRow
+                    icon="pi pi-check"
+                    (click)="updateSupplierDetails(product)"
+                    class="p-button-rounded p-button-text p-button-success mr-2"
+                  ></button>
+                  <button
+                    *ngIf="editing"
+                    pButton
+                    pRipple
+                    type="button"
+                    pCancelEditableRow
+                    icon="pi pi-times"
+                    (click)="onRowEditCancel(product, ri)"
+                    class="p-button-rounded p-button-text p-button-danger"
+                  ></button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+          <!-- <ng-template pTemplate="body" let-product>
+        <tr>
+          <td>{{ product?.paymentDate | date : "dd/MM/yyyy" }}</td>
+          <td>{{ product?.amount | currency : "AED" }}</td>
+        </tr>
+      </ng-template> -->
+        </p-table>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="{{ 'Cancel' | translate }}"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="supplierUpdateDialog = false"
+        ></button>
+        <!-- <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="addInvoice()"
+        ></button> -->
       </ng-template>
     </p-dialog>
   </div>

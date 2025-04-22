@@ -5,6 +5,7 @@ import { MenuService } from '../menu.service';
 @Component({
   selector: 'app-config',
   templateUrl: './config.component.html',
+  standalone: false,
 })
 export class AppConfigComponent {
   @Input() minimal: boolean = false;

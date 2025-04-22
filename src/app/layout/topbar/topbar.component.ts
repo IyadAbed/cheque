@@ -7,6 +7,7 @@ import { TranslationService } from '../../core/services/translation.service';
 @Component({
   selector: 'app-topbar',
   templateUrl: './topbar.component.html',
+  standalone: false,
 })
 export class TopbarComponent {
   items!: MenuItem[];

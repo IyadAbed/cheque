@@ -55,8 +55,6 @@ import { TranslateModule } from '@ngx-translate/core';
     DataViewModule,
     TabViewModule,
     AccordionModule,
-    // PickListModule,
-    // OrderListModule,
     InputTextModule,
     DropdownModule,
     RatingModule,
