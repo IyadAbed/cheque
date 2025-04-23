@@ -638,6 +638,23 @@
         class="flex flex-column justify-content-md-end"
         [formGroup]="invoiceForm"
       >
+
+      <div class="field col-12">
+        <label translate>Attach Files</label>
+        <input
+          type="file"
+          multiple
+          (change)="onFileSelected($event)"
+          accept="image/*"
+        />
+      </div>
+
+      <div class="field col-12">
+        <ul>
+          <li *ngFor="let file of selectedFiles">{{ file.name }}</li>
+        </ul>
+      </div>
+
         <div class="field col-12">
           <label for="supplierId" translate>Supplier</label>
           <p-autoComplete

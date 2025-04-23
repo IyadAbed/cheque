@@ -51,6 +51,8 @@ export class HomeComponent implements OnInit {
   supplierItems: MenuItem[];
   clonedProducts: { [s: string]: Payment } = {};
 
+  selectedFiles: File[] = [];
+
   isSearch: boolean = false;
 
   selectedSupplier: any;
@@ -93,7 +95,7 @@ export class HomeComponent implements OnInit {
 
   langSubscription: Subscription;
 
-  // Bashar
+  // Bashar//
 
   allProjectsToUpdate: Project[] = [];
   allItemsToUpdate: Item[] = [];
@@ -1020,6 +1022,22 @@ export class HomeComponent implements OnInit {
         );
         this.getAllSuppliers();
       });
+  }
+
+  uploadFiles(): void {
+    this.selectedFiles.forEach((file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      this.https.uploadImage(formData, 8080).subscribe({
+        next: (res: any) => {
+          console.log('File uploaded successfully:', res);
+        },
+        error: (err) => {
+          console.error('Error uploading file:', err);
+        },
+      });
+    });
   }
 }
 

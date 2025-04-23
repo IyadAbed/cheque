@@ -111,4 +111,33 @@ export class HttpService {
       showToaster: false,
     });
   }
+
+  uploadImage(data: any, port: number) {
+    return this.restService.request({
+      method: 'POST',
+      url: `${this.usersEndPoint}:${port}/api/v1/media`,
+      body: data,
+      withoutBody: true,
+      isFormData: true,
+      showToaster: false,
+    });
+  }
+
+  uploadImageCallback(image: File, callback: (imageId: string) => void) {
+    const formData = new FormData();
+    formData.append('file', image);
+
+    this.uploadImage(formData, 7086).subscribe({
+      next: (res: any) => {
+        console.log('Image uploaded successfully:', res);
+        const imageId: string = res?.message;
+        console.log('Received imageId:', imageId);
+        callback(imageId);
+      },
+      error: (error) => {
+        alert('خطأ في تحميل الصورة')
+      },
+    });
+  }
+
 }
