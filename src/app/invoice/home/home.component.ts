@@ -51,6 +51,10 @@ export class HomeComponent implements OnInit {
   supplierItems: MenuItem[];
   clonedProducts: { [s: string]: Payment } = {};
 
+  uploadedFiles: any[] = [];
+  uploadedFilesToInvoice: any[] = [];
+
+
   selectedFiles: File[] = [];
 
   isSearch: boolean = false;
@@ -94,6 +98,7 @@ export class HomeComponent implements OnInit {
   totalRemaining: number = 0;
 
   langSubscription: Subscription;
+  baseUrl: string = 'http://http://185.211.6.191:8080/api/v1/media/';
 
   // Bashar//
 
@@ -643,7 +648,7 @@ export class HomeComponent implements OnInit {
     if (type === 'supplier') {
       for (let i = 0; i < (this.allSuppliers as Supplier[]).length; i++) {
         let suppliers = (this.allSuppliers as Supplier[])[i];
-        if (suppliers.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        if (suppliers.name?.toLowerCase().indexOf(query?.toLowerCase()) == 0) {
           filtered.push(suppliers.name);
         }
       }
@@ -652,7 +657,7 @@ export class HomeComponent implements OnInit {
     } else if (type === 'project') {
       for (let i = 0; i < (this.allProjects as Project[]).length; i++) {
         let projects = (this.allProjects as Project[])[i];
-        if (projects.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        if (projects.name?.toLowerCase().indexOf(query?.toLowerCase()) == 0) {
           filtered.push(projects.name);
         }
       }
@@ -663,7 +668,7 @@ export class HomeComponent implements OnInit {
 
       for (let i = 0; i < (this.allItem as Item[]).length; i++) {
         let items = (this.allItem as Item[])[i];
-        if (items.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        if (items.name?.toLowerCase().indexOf(query?.toLowerCase()) == 0) {
           filtered.push(items.name);
         }
       }
@@ -782,6 +787,7 @@ export class HomeComponent implements OnInit {
           amount: this.invoiceForm.value.amount,
           items: itemsData,
           taxable: true,
+          fileName: this.uploadedFilesToInvoice.length > 0 ? this.uploadedFilesToInvoice.map(imageId=>(imageId.fileName)) : null,
         };
 
         if (this.updateInvoice) {
@@ -1039,7 +1045,63 @@ export class HomeComponent implements OnInit {
       });
     });
   }
+
+  onUpload(event: any): void {
+    console.log('event', event);
+    const uploadedFiles = event.files; // Files uploaded by the user
+    uploadedFiles.forEach((file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      this.https.uploadImage(formData, 8080).subscribe({
+        next: (res: any) => {
+          console.log('File uploaded successfully:', res);
+
+          this.uploadedFiles.push(file); 
+          this.uploadedFilesToInvoice.push(res)// Store the uploaded file with its ID
+          console.log('Uploaded files:', this.uploadedFilesToInvoice);
+        },
+        error: (err) => {
+          console.error('Error uploading file:', err);
+        },
+      });
+    });
+    // this.messageService.add({severity: 'info', summary: 'File Uploaded', detail: ''});
+  }
+
+  onClear(): void {
+     // Clear the uploaded files array
+    console.log('Files cleared:', this.uploadedFilesToInvoice);
+    this.uploadedFilesToInvoice.forEach((file: any) => {
+      this.https.sendDeleteRequest(`media/${file?.fileName}`, 8080).subscribe({
+        next: (res) => {
+          console.log('File deleted successfully:', res);
+        },
+        error: (err) => {
+          console.error('Error deleting file:', err);
+        },
+      });
+    });
+    this.uploadedFiles = []; // Clear the uploaded files array
+    this.uploadedFilesToInvoice = [];
+  }
+
+  download(fileName: string[]){
+    fileName.forEach((file) => {
+      this.https.downloadexcel(file, 'v1',8080).subscribe((res) => {
+        const blob = new Blob([res], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file; // Set the desired file name
+        a.click();
+        window.URL.revokeObjectURL(url); // Clean up the URL object
+      });
+    });
+  }
+
 }
+
 
 export interface Supplier {
   id: string;
@@ -1072,6 +1134,7 @@ export interface InvoiceRes {
   invoiceDate: string; // Alternatively, use Date if parsing dates automatically
   amount: number;
   paidAmount: number;
+  fileName: string[];
   taxable: boolean;
   status: 'ACTIVE' | 'INACTIVE' | string; // adjust union as needed
   paymentStatus: 'PAID' | 'UNPAID' | string; // adjust union as needed
@@ -1085,6 +1148,7 @@ export interface InvoiceReq {
   startDate?: string;
   endDate?: string;
   taxable?: boolean;
+  fileName?: string[];
   paymentStatus?: string;
 }
 

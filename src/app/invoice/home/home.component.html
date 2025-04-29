@@ -260,6 +260,9 @@
             <th pSortableColumn="supplierName" translate>
               Supplier <p-sortIcon></p-sortIcon>
             </th>
+            <th pSortableColumn="supplierName" translate>
+              Files <p-sortIcon></p-sortIcon>
+            </th>
             <!-- <th>Image</th> -->
             <th pSortableColumn="amount" translate>Amount</th>
             <th pSortableColumn="paidAmount" translate>Paid Amount</th>
@@ -294,6 +297,16 @@
             <td style="width: 14%; min-width: 10rem">
               <span class="p-column-title">Supplier</span>
               {{ product.supplierName }}
+            </td>
+            <td style="width: 14%; min-width: 10rem" (click)="download(product.fileName)" >
+              <span class="p-column-title"></span>
+              @if(product.fileName) {
+                <span class="pointer" >
+                  Download
+                </span>
+              }@else {
+                <span>No File</span>
+              }
             </td>
             <td style="width: 14%; min-width: 8rem">
               <span class="p-column-title">amount</span>
@@ -638,22 +651,34 @@
         class="flex flex-column justify-content-md-end"
         [formGroup]="invoiceForm"
       >
+        <div class="field col-12">
+          <label translate>Attach Files</label>
+          <p-fileUpload
+            name="files[]"
+            url="http://185.211.6.191:8080/api/v1/media"
+            auto="false"
+            customUpload="true"
+            (uploadHandler)="onUpload($event)"
+            [multiple]="true"
+            accept="image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, text/csv"
+            maxFileSize="1000000"
+            (onClear)="onClear()"
+          >
+            <ng-template pTemplate="content">
+              <ul *ngIf="uploadedFiles.length">
+                <li *ngFor="let file of uploadedFiles">
+                  {{ file.name }} - {{ file.size }} bytes
+                </li>
+              </ul>
+            </ng-template>
+          </p-fileUpload>
+        </div>
 
-      <div class="field col-12">
-        <label translate>Attach Files</label>
-        <input
-          type="file"
-          multiple
-          (change)="onFileSelected($event)"
-          accept="image/*"
-        />
-      </div>
-
-      <div class="field col-12">
-        <ul>
-          <li *ngFor="let file of selectedFiles">{{ file.name }}</li>
-        </ul>
-      </div>
+        <div class="field col-12">
+          <ul>
+            <li *ngFor="let file of selectedFiles">{{ file.name }}</li>
+          </ul>
+        </div>
 
         <div class="field col-12">
           <label for="supplierId" translate>Supplier</label>

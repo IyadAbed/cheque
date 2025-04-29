@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment.prod';
 import { RestService } from './core/services/rest.service';
+import { map, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HttpService {
   usersEndPoint: string = '';
-  constructor(private restService: RestService) {
+  constructor(private restService: RestService, private http: HttpClient) {
     this.usersEndPoint = environment.apiEndpoint;
   }
 
@@ -138,6 +140,25 @@ export class HttpService {
         alert('خطأ في تحميل الصورة')
       },
     });
+  }
+
+  downloadexcel(
+    url: string,
+    version: "v1" | "v2" = "v1",
+    port: number
+  ): Observable<Blob> {
+
+    const fullUrl = `${this.usersEndPoint}:8080/api/v1/media/${url}`;
+
+    return this.http
+      .get(fullUrl, {
+        // Use post and include the body
+        responseType: "blob", // Set the response type to blob
+        observe: "response", // Observe the full response for headers, status, etc.
+      })
+      .pipe(
+        map((response) => response.body as Blob) // Extract the Blob from the response
+      );
   }
 
 }
