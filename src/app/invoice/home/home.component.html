@@ -260,9 +260,12 @@
             <th pSortableColumn="supplierName" translate>
               Supplier <p-sortIcon></p-sortIcon>
             </th>
-            <th pSortableColumn="supplierName" translate>
+            <th pSortableColumn="fileName" translate>
               Files <p-sortIcon></p-sortIcon>
             </th>
+            <!-- <th pSortableColumn="upload" translate>
+              Upload <p-sortIcon></p-sortIcon>
+            </th> -->
             <!-- <th>Image</th> -->
             <th pSortableColumn="amount" translate>Amount</th>
             <th pSortableColumn="paidAmount" translate>Paid Amount</th>
@@ -298,16 +301,31 @@
               <span class="p-column-title">Supplier</span>
               {{ product.supplierName }}
             </td>
-            <td style="width: 14%; min-width: 10rem" (click)="download(product.fileName)" >
+            <td style="width: 7%; min-width: 10rem" (click)="download(product.fileName)" >
               <span class="p-column-title"></span>
               @if(product.fileName) {
-                <span class="pointer" >
+                <span class="pointer text-center" >
                   Download
                 </span>
               }@else {
                 <span>No File</span>
               }
             </td>
+            <!-- <td style="width: 7%; min-width: 10rem">
+              <span class="p-column-title">Upload</span>
+              <p-fileUpload 
+              mode="basic" 
+              auto="false"
+              customUpload="true"
+              name="files[]" 
+              (uploadHandler)="onUploadInvoice($event, product.id)"
+              chooseIcon="pi pi-upload" 
+              url="http://185.211.6.191:8080/api/v1/media"
+              accept="image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, text/csv"
+              maxFileSize="1000000" 
+              [auto]="false" 
+              chooseLabel="Browse" />
+            </td> -->
             <td style="width: 14%; min-width: 8rem">
               <span class="p-column-title">amount</span>
               <p>
@@ -651,7 +669,7 @@
         class="flex flex-column justify-content-md-end"
         [formGroup]="invoiceForm"
       >
-        <div class="field col-12">
+        <div class="field col-12" *ngIf="!updateInvoice">
           <label translate>Attach Files</label>
           <p-fileUpload
             name="files[]"
@@ -674,7 +692,7 @@
           </p-fileUpload>
         </div>
 
-        <div class="field col-12">
+        <div class="field col-12" *ngIf="!updateInvoice">
           <ul>
             <li *ngFor="let file of selectedFiles">{{ file.name }}</li>
           </ul>

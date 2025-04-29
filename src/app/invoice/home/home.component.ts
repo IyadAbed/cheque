@@ -1069,6 +1069,31 @@ export class HomeComponent implements OnInit {
     // this.messageService.add({severity: 'info', summary: 'File Uploaded', detail: ''});
   }
 
+  onUploadInvoice(event: any, id:string): void {
+    console.log('event', event);
+    const uploadedFiles = event.files; // Files uploaded by the user
+    uploadedFiles.forEach((file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      this.https.uploadImage(formData, 8080).subscribe({
+        next: (res: any) => {
+          console.log('File uploaded successfully:', res);
+          this.uploadedFiles.push(file);
+          this.uploadedFilesToInvoice.push(res)// Store the uploaded file with its ID
+          console.log('Uploaded files:', this.uploadedFilesToInvoice);
+        },
+        error: (err) => {
+          console.error('Error uploading file:', err);
+        },
+      });
+    });
+    this.https.sendPutRequest(`invoices/${id}`, { fileName: this.uploadedFilesToInvoice }, 8080).subscribe({
+      next: (res) => {
+        console.log('File uploaded successfully:', res);
+      }
+    });
+  }
+
   onClear(): void {
      // Clear the uploaded files array
     console.log('Files cleared:', this.uploadedFilesToInvoice);
